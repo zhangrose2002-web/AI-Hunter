@@ -29,4 +29,5 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data.json
           git diff --quiet && echo "No changes" || git commit -m "Auto update: $(date -u)"
+          git pull --rebase
           git push origin main
