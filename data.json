@@ -103,5 +103,21 @@
       "source": "https://ai-bot.cn/sites/8204.html"
     }
   ],
-  "trend": []
+  "trend": [
+    {
+      "title": "💻 硬核 | 智谱上市招股书深度解读",
+      "desc": "V2EX 社区热议",
+      "source": "https://www.v2ex.com/t/1180086#reply1"
+    },
+    {
+      "title": "💻 ChatGPT for Mac 常见无法复制问题",
+      "desc": "V2EX 社区热议",
+      "source": "https://www.v2ex.com/t/1180032#reply11"
+    },
+    {
+      "title": "💡 AI 创业者需关注：模型降本与 Agent 落地",
+      "desc": "行业分析",
+      "source": "https://36kr.com"
+    }
+  ]
 }
