@@ -1,213 +1,168 @@
 # -*- coding: utf-8 -*-
 """
-AI Hunter - 全球版（调试增强版）
+AI Hunter - 创业者加强版 (全球猎捕)
+目标：为创业者精选 降本、增效、看趋势 的核心工具
 """
 
 import json
 import requests
 from bs4 import BeautifulSoup
 import sys
-import os
+import time
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
-def clean_text(text):
-    if not text:
-        return ""
-    return ''.join(c for c in str(text) if ord(c) >= 32 or c in '\n\t\r')
-
+# --- 关键词库：深度适配创业场景 ---
 COST_KEYWORDS = [
-    '客服', '人力', '节省', '降本', '替代', '自动化', '外包', '减少', '低成本',
-    '免费', '开源', '计费', '预算', '财务', '报销', '合同', '法务', '招聘',
-    'cost', 'save money', 'reduce cost', 'replace', 'automate', 'free', 'open source',
-    'budget', 'cheaper', 'cut expenses', 'customer service', 'outsourcing'
+    '免费', '开源', '降本', '替代', '自动化', '人力', '节省', '客服', '外包', '平替',
+    'free', 'open source', 'save cost', 'replace', 'automate', 'outsourcing', 'low code'
 ]
 
 EFFICIENCY_KEYWORDS = [
-    '效率', '提升', '加速', '快速', '一键', '自动生成', '智能', '秒出', '批量',
-    '设计', '剪辑', '写作', 'PPT', '周报', '会议', '翻译', '抠图', '排版', '绘图',
-    'efficiency', 'boost', 'speed up', 'automate', 'generate', 'design', 'write',
-    'edit', 'translate', 'create', 'productivity', 'workflow', 'fast', 'instant',
-    'batch', 'summarize', 'analyze'
+    '效率', '提效', '一键', '生成', '批量', '智能', '办公', '营销', '剪辑', '写作', 'PPT',
+    'efficiency', 'productivity', 'boost', 'workflow', 'marketing', 'content creation'
 ]
 
+TREND_KEYWORDS = [
+    '突破', '发布', '融资', '趋势', '报告', '首发', '重磅', 'OpenAI', 'Sora', 'Claude',
+    'breakthrough', 'funding', 'trend', 'report', 'unveiled', 'investment'
+]
+
+def clean_text(text):
+    return ''.join(c for c in str(text) if ord(c) >= 32).strip() if text else ""
+
 def classify_tool(desc, title):
-    text = (clean_text(title) + " " + clean_text(desc)).lower()
-    cost_score = sum(1 for kw in COST_KEYWORDS if kw in text)
-    eff_score = sum(1 for kw in EFFICIENCY_KEYWORDS if kw in text)
-    return "cost" if cost_score > eff_score else "efficiency"
-
-def deduplicate(tools):
-    seen = set()
-    unique = []
-    for t in tools:
-        key = clean_text(t['title']).strip().lower()
-        if key and key not in seen:
-            seen.add(key)
-            unique.append(t)
-    return unique
+    text = (title + " " + desc).lower()
+    cost_score = sum(2 if kw in text else 0 for kw in COST_KEYWORDS)
+    eff_score = sum(1 if kw in text else 0 for kw in EFFICIENCY_KEYWORDS)
+    # 创业者更看重降本，权重稍高
+    return "cost" if cost_score >= eff_score and cost_score > 0 else "efficiency"
 
 # ========================
-# 抓取国内：发现AI
+# 捕猎源 1：AI工具集 (国内优质源)
 # ========================
+def fetch_aibot(max_items=20):
+    print("🔍 猎捕中：AI工具集 (国内)...")
+    tools = []
+    try:
+        res = requests.get("https://ai-bot.cn/", headers=HEADERS, timeout=10)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        cards = soup.select('.url-card')[:max_items]
+        for card in cards:
+            title = card.select_one('strong').get_text(strip=True)
+            desc = card.select_one('.url-info p').get_text(strip=True)
+            link = card.select_one('a')['href']
+            tools.append({"title": title, "desc": desc, "source": link})
+    except Exception as e: print(f"⚠️ AI工具集捕获跳过: {e}")
+    return tools
 
-def fetch_faxianai(max_items=8):
-    print("🔍 开始抓取 发现AI...")
+# ========================
+# 捕猎源 2：发现AI (国内优质源)
+# ========================
+def fetch_faxianai(max_items=15):
+    print("🔍 猎捕中：发现AI (国内)...")
     tools = []
     try:
         res = requests.get("https://faxianai.com", headers=HEADERS, timeout=10)
-        print(f"✅ 发现AI 请求成功: {res.status_code}")
         soup = BeautifulSoup(res.text, 'html.parser')
         cards = soup.select('a[href^="/tool/"]')[:max_items]
-        print(f"✅ 找到 {len(cards)} 个工具卡片")
         for card in cards:
-            title_elem = card.select_one('h3')
-            desc_elem = card.select_one('p')
-            tag_elem = card.select_one('span.bg-blue-100')
-            title = clean_text(title_elem.get_text(strip=True)) if title_elem else ""
-            desc = clean_text(desc_elem.get_text(strip=True)) if desc_elem else ""
-            tag = clean_text(tag_elem.get_text(strip=True)) if tag_elem else ""
+            title = card.select_one('h3').get_text(strip=True)
+            desc = card.select_one('p').get_text(strip=True)
             source = "https://faxianai.com" + card['href']
-            if title:
-                print(f"📝 添加工具: {title}")
-                tools.append({"title": title, "desc": f"{desc} {tag}".strip(), "source": source})
-    except Exception as e:
-        print(f"❌ 发现AI 抓取失败: {e}")
+            tools.append({"title": title, "desc": desc, "source": source})
+    except Exception as e: print(f"⚠️ 发现AI捕获跳过: {e}")
     return tools
 
 # ========================
-# 抓取国外：FutureTools.io
+# 捕猎源 3：FutureTools (全球视野)
 # ========================
-
-def fetch_futuretools(max_items=10):
-    print("🔍 开始抓取 FutureTools...")
+def fetch_futuretools(max_items=20):
+    print("🔍 猎捕中：FutureTools (全球)...")
     tools = []
     try:
-        res = requests.get("https://www.futuretools.io", headers=HEADERS, timeout=15)
-        print(f"✅ FutureTools 请求成功: {res.status_code}")
+        # 抓取按日期排序的最新工具
+        res = requests.get("https://www.futuretools.io/?sort=date-added", headers=HEADERS, timeout=15)
         soup = BeautifulSoup(res.text, 'html.parser')
         cards = soup.select('div[role="article"]')[:max_items]
-        print(f"✅ 找到 {len(cards)} 个工具卡片")
         for card in cards:
             title_elem = card.select_one('h2 a')
             desc_elem = card.select_one('p')
-            if not title_elem:
-                continue
-            title = clean_text(title_elem.get_text(strip=True))
-            desc = clean_text(desc_elem.get_text(strip=True)) if desc_elem else ""
-            source = title_elem['href'] if title_elem.has_attr('href') else "#"
-            if title:
-                print(f"📝 添加工具: {title}")
-                tools.append({"title": title, "desc": desc, "source": source})
-    except Exception as e:
-        print(f"❌ FutureTools 抓取失败: {e}")
+            if title_elem:
+                tools.append({
+                    "title": title_elem.get_text(strip=True),
+                    "desc": desc_elem.get_text(strip=True) if desc_elem else "",
+                    "source": title_elem['href'] if title_elem.has_attr('href') else "#"
+                })
+    except Exception as e: print(f"⚠️ FutureTools捕获跳过: {e}")
     return tools
 
 # ========================
-# 手动兜底
+# 趋势源：36Kr AI 专栏
 # ========================
-
-def get_manual_tools():
-    return {
-        "cost": [
-            {"title": "Doubao (豆包)", "desc": "免费 AI 助手，适用于客服与日常问答", "source": "https://www.doubao.com"},
-            {"title": "WPS AI", "desc": "自动化办公任务，降低软件采购与人力成本", "source": "https://www.wps.cn/ai"}
-        ],
-        "efficiency": [
-            {"title": "美图秀秀", "desc": "AI 一键修图、抠图、美化，秒出专业效果", "source": "https://xiuxiu.meitu.com"},
-            {"title": "通义千问 (Qwen)", "desc": "自动生成周报、邮件、总结，提升写作效率", "source": "https://qwen.ai"},
-            {"title": "Canva Magic Studio", "desc": "用文字生成海报、PPT、社交媒体图", "source": "https://www.canva.com/magic-studio/"},
-            {"title": "Notion AI", "desc": "智能整理笔记、生成待办、总结长文", "source": "https://www.notion.so/product/ai"}
-        ]
-    }
-
-# ========================
-# 趋势新闻
-# ========================
-
-def get_trend_news(max_items=3):
+def fetch_36kr_trends(max_items=5):
+    print("📡 监测中：36Kr 趋势雷达...")
+    trends = []
     try:
         res = requests.get("https://36kr.com/newsflashes", headers=HEADERS, timeout=10)
-        print(f"✅ 36Kr 请求成功: {res.status_code}")
         res.encoding = 'utf-8'
         soup = BeautifulSoup(res.text, 'html.parser')
-        items = []
-        for item in soup.select('div.newsflash-item')[:max_items]:
+        for item in soup.select('div.newsflash-item')[:15]: # 扩大筛选范围
             title_elem = item.select_one('a.article-title')
-            if not title_elem:
-                continue
-            title = clean_text(title_elem.get_text(strip=True))
-            link = "https://36kr.com" + title_elem['href'] if title_elem.has_attr('href') else "#"
-            if any(kw in title for kw in ['AI', '人工智能', '大模型', 'AIGC']):
-                items.append({"title": title, "desc": "来源：36Kr", "source": link})
-        return items or [{"title": "全球 AI 应用加速落地", "desc": "企业需求激增", "source": "https://36kr.com"}]
-    except Exception as e:
-        print(f"❌ 趋势新闻抓取失败: {e}")
-        return [{"title": "趋势加载中...", "desc": "请稍后刷新", "source": "#"}]
-
-# ========================
-# 主程序
-# ========================
+            if not title_elem: continue
+            title = title_elem.get_text(strip=True)
+            # 仅筛选与创业/AI 强相关的趋势
+            if any(kw in title.lower() for kw in TREND_KEYWORDS + ['ai', '人工智能', '机器人']):
+                trends.append({
+                    "title": title,
+                    "desc": "创业趋势快报",
+                    "source": "https://36kr.com" + title_elem['href']
+                })
+            if len(trends) >= max_items: break
+    except Exception as e: print(f"⚠️ 趋势捕获失败: {e}")
+    return trends
 
 def main():
-    print("🚀 开始抓取全球 AI 工具...")
+    print("🚀 AI Hunter 启动，正在为创业者猎捕全球商机...")
+    
+    # 汇总所有工具
+    raw_tools = []
+    raw_tools.extend(fetch_aibot(25))
+    raw_tools.extend(fetch_faxianai(20))
+    raw_tools.extend(fetch_futuretools(25))
 
-    all_tools = []
+    # 去重处理
+    unique_tools = []
+    seen_titles = set()
+    for t in raw_tools:
+        name = t['title'].lower().strip()
+        if name not in seen_titles:
+            seen_titles.add(name)
+            unique_tools.append(t)
 
-    print("🇨🇳 抓取 发现AI...")
-    all_tools.extend(fetch_faxianai())
+    # 分类逻辑
+    data = {"cost": [], "efficiency": [], "trend": []}
+    for t in unique_tools:
+        cat = classify_tool(t['desc'], t['title'])
+        data[cat].append(t)
 
-    print("🌎 抓取 FutureTools...")
-    all_tools.extend(fetch_futuretools())
+    # 猎捕趋势
+    data["trend"] = fetch_36kr_trends(6)
 
-    # 去重
-    all_tools = deduplicate(all_tools)
-    print(f"✅ 去重后共 {len(all_tools)} 个工具")
-
-    # 分类
-    cost_list = []
-    efficiency_list = []
-    for tool in all_tools:
-        category = classify_tool(tool['desc'], tool['title'])
-        if category == "cost":
-            cost_list.append(tool)
-        else:
-            efficiency_list.append(tool)
-
-    print(f"📊 分类结果:")
-    print(f"   - 成本杀手: {len(cost_list)} 个")
-    print(f"   - 效率倍增: {len(efficiency_list)} 个")
-
-    # 兜底
-    manual = get_manual_tools()
-    if len(cost_list) < 2:
-        cost_list = manual["cost"]
-    if len(efficiency_list) < 3:
-        efficiency_list = manual["efficiency"]
-
-    # 趋势
-    trend = get_trend_news()
-
-    # 构建数据
-    data = {
-        "cost": cost_list,
-        "efficiency": efficiency_list,
-        "trend": trend
-    }
-
-    # 写入文件
-    try:
-        with open('data.json', 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        print(f"\n✅ 成功生成 data.json！")
-        print(f"   - 成本杀手: {len(cost_list)} 个")
-        print(f"   - 效率倍增: {len(efficiency_list)} 个")
-        print(f"   - 趋势雷达: {len(trend)} 条")
-    except Exception as e:
-        print(f"❌ 写入 data.json 失败: {e}")
-        sys.exit(1)
+    # 兜底：如果某项太少，保持之前的展示
+    if len(data["cost"]) < 3:
+        data["cost"].append({"title": "Claude 3.5 Sonnet", "desc": "高性价比的智能模型，替代初级分析师", "source": "https://claude.ai"})
+    
+    # 写入 JSON
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    
+    print(f"\n✅ 猎捕完成！")
+    print(f"💰 发现 {len(data['cost'])} 个降本工具")
+    print(f"⚡ 发现 {len(data['efficiency'])} 个增效工具")
+    print(f"📡 捕获 {len(data['trend'])} 条行业趋势")
 
 if __name__ == "__main__":
     main()
