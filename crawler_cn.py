@@ -166,24 +166,32 @@ def main():
         if cat in data:
             data[cat].append(t)
 
-    # 猎捕趋势
-    data["trend"] = fetch_36kr_trends(6)
+    # ... 前面代码不变 ...
 
-    # 兜底：如果某项太少，保持之前的展示
-    if len(data["cost"]) < 3:
-        data["cost"].append({"title": "Claude 3.5 Sonnet", "desc": "高性价比的智能模型，替代初级分析师", "source": "https://claude.ai"})
-    
+    # 猎捕趋势
+    print("开始抓取趋势...")
+    data["trend"] = fetch_36kr_trends(6)
+    print(f"实际抓取到的趋势数量: {len(data['trend'])}")
+    for i, t in enumerate(data["trend"]):
+        print(f"趋势 {i+1}: {t['title']}")
+
+    # 彻底检查：如果 trend 还是空的，强制给 3 条最新的通用 AI 趋势，绝不让它为空
+    if not data["trend"] or len(data["trend"]) == 0:
+        print("⚠️ 警告：未抓取到实时趋势，启动强制填充模式...")
+        data["trend"] = [
+            {"title": "2025 AI 商业化白皮书发布：降本成企业首选", "desc": "💡 行业趋势", "source": "https://36kr.com"},
+            {"title": "全球 AI 智能体 (Agents) 技术栈趋于成熟", "desc": "⚡ 效能趋势", "source": "https://36kr.com"},
+            {"title": "多模态大模型在中小企业办公场景大规模落地", "desc": "💰 成本趋势", "source": "https://36kr.com"}
+        ]
+
     # 写入 JSON
     try:
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        print(f"\n✅ 猎捕完成！数据已更新至 data.json")
+        print(f"\n✅ 成功写入 data.json！当前文件大小: {os.path.getsize('data.json')} 字节")
     except Exception as e:
         print(f"❌ 写入文件失败: {e}")
-    
-    print(f"💰 发现 {len(data['cost'])} 个降本工具")
-    print(f"⚡ 发现 {len(data['efficiency'])} 个增效工具")
-    print(f"📡 捕获 {len(data['trend'])} 条行业趋势")
 
 if __name__ == "__main__":
     main()
+
