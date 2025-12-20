@@ -12,7 +12,7 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # 允许 push 回仓库
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
@@ -31,7 +31,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # 仅当 data.json 有变化时才提交
           git add data.json
           if ! git diff --cached --quiet; then
             git commit -m "Auto update: $(date -u)"
@@ -40,20 +39,3 @@ jobs:
           else
             echo "ℹ️ No changes in data.json. Skip commit."
           fi
-
-      - name: 🚀 Deploy to FTP (only essential files)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
-          server-dir: /wwwroot/ai-hunter/
-          # 只上传网站所需文件，排除敏感/无用文件
-          exclude:
-            - .git*
-            - .github/
-            - *.py
-            - README.md
-            - LICENSE
-            - __pycache__/
