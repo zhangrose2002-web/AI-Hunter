@@ -31,3 +31,12 @@ jobs:
           git commit -m "Auto update trends and tools" || exit 0
           git pull --rebase origin main
           git push origin main
+
+        - name: 🚀 部署到我的空间
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}    # 你的空间 FTP 地址
+          username: ${{ secrets.FTP_USERNAME }} # FTP 用户名
+          password: ${{ secrets.FTP_PASSWORD }} # FTP 密码
+          local-dir: ./                        # 上传当前目录所有文件
+          server-dir: /wwwroot/ai-hunter/      # 你的空间目标文件夹
