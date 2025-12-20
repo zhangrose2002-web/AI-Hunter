@@ -101,38 +101,7 @@
       "title": "蛙蛙写作",
       "desc": "AI小说和内容创作工具",
       "source": "https://ai-bot.cn/sites/8204.html"
-    },
-    {
-      "title": "笔灵AI写作",
-      "desc": "600+写作模板、AI一键生成论文/小说，论文降重降AI",
-      "source": "https://ibiling.cn/?from=ai-bot"
-    },
-    {
-      "title": "新华妙笔",
-      "desc": "新华社推出的体制内办公学习平台",
-      "source": "https://miaobi.xinhuaskl.com/?channel=shuzhi"
-    },
-    {
-      "title": "笔灵AI小说",
-      "desc": "AI一键写全篇+爆文拆解，搞定大纲、素材，新手写作过稿神器！",
-      "source": "https://ai-bot.cn/sites/22626.html"
-    },
-    {
-      "title": "稿定AI文案",
-      "desc": "小红书、公众号、短视频AI文案生成工具",
-      "source": "https://ai-bot.cn/sites/49483.html"
     }
   ],
-  "trend": [
-    {
-      "title": "全球 AI 应用进入爆发期",
-      "desc": "创业者需关注垂直赛道机会",
-      "source": "https://36kr.com"
-    },
-    {
-      "title": "大模型降本增效成为企业共识",
-      "desc": "降本工具需求量激增",
-      "source": "https://36kr.com"
-    }
-  ]
+  "trend": []
 }
