@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-AI Hunter - 全球版（GitHub Actions 优化版）
-抓取国内外热门 AI 工具，并智能分类到 cost / efficiency
-自动去重、兜底、生成标准 data.json
+AI Hunter - 全球版（调试增强版）
 """
 
 import json
@@ -12,33 +10,24 @@ import sys
 import os
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
 
 def clean_text(text):
-    """安全清理文本：移除控制字符，保留合法空白"""
     if not text:
         return ""
     return ''.join(c for c in str(text) if ord(c) >= 32 or c in '\n\t\r')
 
-# ========================
-# 分类关键词（中英文）
-# ========================
-
 COST_KEYWORDS = [
-    # 中文
     '客服', '人力', '节省', '降本', '替代', '自动化', '外包', '减少', '低成本',
     '免费', '开源', '计费', '预算', '财务', '报销', '合同', '法务', '招聘',
-    # 英文
     'cost', 'save money', 'reduce cost', 'replace', 'automate', 'free', 'open source',
     'budget', 'cheaper', 'cut expenses', 'customer service', 'outsourcing'
 ]
 
 EFFICIENCY_KEYWORDS = [
-    # 中文
     '效率', '提升', '加速', '快速', '一键', '自动生成', '智能', '秒出', '批量',
     '设计', '剪辑', '写作', 'PPT', '周报', '会议', '翻译', '抠图', '排版', '绘图',
-    # 英文
     'efficiency', 'boost', 'speed up', 'automate', 'generate', 'design', 'write',
     'edit', 'translate', 'create', 'productivity', 'workflow', 'fast', 'instant',
     'batch', 'summarize', 'analyze'
@@ -65,12 +54,14 @@ def deduplicate(tools):
 # ========================
 
 def fetch_faxianai(max_items=8):
+    print("🔍 开始抓取 发现AI...")
     tools = []
     try:
         res = requests.get("https://faxianai.com", headers=HEADERS, timeout=10)
-        res.encoding = 'utf-8'
+        print(f"✅ 发现AI 请求成功: {res.status_code}")
         soup = BeautifulSoup(res.text, 'html.parser')
         cards = soup.select('a[href^="/tool/"]')[:max_items]
+        print(f"✅ 找到 {len(cards)} 个工具卡片")
         for card in cards:
             title_elem = card.select_one('h3')
             desc_elem = card.select_one('p')
@@ -80,9 +71,10 @@ def fetch_faxianai(max_items=8):
             tag = clean_text(tag_elem.get_text(strip=True)) if tag_elem else ""
             source = "https://faxianai.com" + card['href']
             if title:
+                print(f"📝 添加工具: {title}")
                 tools.append({"title": title, "desc": f"{desc} {tag}".strip(), "source": source})
     except Exception as e:
-        print(f"⚠️ 发现AI抓取失败: {e}")
+        print(f"❌ 发现AI 抓取失败: {e}")
     return tools
 
 # ========================
@@ -90,11 +82,14 @@ def fetch_faxianai(max_items=8):
 # ========================
 
 def fetch_futuretools(max_items=10):
+    print("🔍 开始抓取 FutureTools...")
     tools = []
     try:
         res = requests.get("https://www.futuretools.io", headers=HEADERS, timeout=15)
+        print(f"✅ FutureTools 请求成功: {res.status_code}")
         soup = BeautifulSoup(res.text, 'html.parser')
         cards = soup.select('div[role="article"]')[:max_items]
+        print(f"✅ 找到 {len(cards)} 个工具卡片")
         for card in cards:
             title_elem = card.select_one('h2 a')
             desc_elem = card.select_one('p')
@@ -104,13 +99,14 @@ def fetch_futuretools(max_items=10):
             desc = clean_text(desc_elem.get_text(strip=True)) if desc_elem else ""
             source = title_elem['href'] if title_elem.has_attr('href') else "#"
             if title:
+                print(f"📝 添加工具: {title}")
                 tools.append({"title": title, "desc": desc, "source": source})
     except Exception as e:
-        print(f"⚠️ FutureTools抓取失败: {e}")
+        print(f"❌ FutureTools 抓取失败: {e}")
     return tools
 
 # ========================
-# 手动兜底数据
+# 手动兜底
 # ========================
 
 def get_manual_tools():
@@ -128,12 +124,13 @@ def get_manual_tools():
     }
 
 # ========================
-# 趋势新闻（36氪）
+# 趋势新闻
 # ========================
 
 def get_trend_news(max_items=3):
     try:
         res = requests.get("https://36kr.com/newsflashes", headers=HEADERS, timeout=10)
+        print(f"✅ 36Kr 请求成功: {res.status_code}")
         res.encoding = 'utf-8'
         soup = BeautifulSoup(res.text, 'html.parser')
         items = []
@@ -143,11 +140,11 @@ def get_trend_news(max_items=3):
                 continue
             title = clean_text(title_elem.get_text(strip=True))
             link = "https://36kr.com" + title_elem['href'] if title_elem.has_attr('href') else "#"
-            if any(kw in title for kw in ['AI', '人工智能', '大模型', 'AIGC', '生成式']):
+            if any(kw in title for kw in ['AI', '人工智能', '大模型', 'AIGC']):
                 items.append({"title": title, "desc": "来源：36Kr", "source": link})
         return items or [{"title": "全球 AI 应用加速落地", "desc": "企业需求激增", "source": "https://36kr.com"}]
     except Exception as e:
-        print(f"⚠️ 趋势新闻抓取失败: {e}")
+        print(f"❌ 趋势新闻抓取失败: {e}")
         return [{"title": "趋势加载中...", "desc": "请稍后刷新", "source": "#"}]
 
 # ========================
@@ -167,6 +164,7 @@ def main():
 
     # 去重
     all_tools = deduplicate(all_tools)
+    print(f"✅ 去重后共 {len(all_tools)} 个工具")
 
     # 分类
     cost_list = []
@@ -178,9 +176,9 @@ def main():
         else:
             efficiency_list.append(tool)
 
-    # 限制数量（防止前端过载）
-    cost_list = cost_list[:5]
-    efficiency_list = efficiency_list[:8]
+    print(f"📊 分类结果:")
+    print(f"   - 成本杀手: {len(cost_list)} 个")
+    print(f"   - 效率倍增: {len(efficiency_list)} 个")
 
     # 兜底
     manual = get_manual_tools()
@@ -192,14 +190,14 @@ def main():
     # 趋势
     trend = get_trend_news()
 
-    # 构建最终数据
+    # 构建数据
     data = {
         "cost": cost_list,
         "efficiency": efficiency_list,
         "trend": trend
     }
 
-    # 安全写入 data.json
+    # 写入文件
     try:
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
