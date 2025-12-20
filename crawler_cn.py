@@ -100,28 +100,45 @@ def fetch_futuretools(max_items=20):
     return tools
 
 # ========================
-# 趋势源：36Kr AI 专栏
+# 趋势源：36Kr AI 专栏 (增强版)
 # ========================
-def fetch_36kr_trends(max_items=5):
-    print("📡 监测中：36Kr 趋势雷达...")
+def fetch_36kr_trends(max_items=6):
+    print("📡 监测中：36Kr 趋势雷达（增强版）...")
     trends = []
     try:
         res = requests.get("https://36kr.com/newsflashes", headers=HEADERS, timeout=10)
         res.encoding = 'utf-8'
         soup = BeautifulSoup(res.text, 'html.parser')
-        for item in soup.select('div.newsflash-item')[:15]: # 扩大筛选范围
-            title_elem = item.select_one('a.article-title')
-            if not title_elem: continue
-            title = title_elem.get_text(strip=True)
-            # 仅筛选与创业/AI 强相关的趋势
-            if any(kw in title.lower() for kw in TREND_KEYWORDS + ['ai', '人工智能', '机器人']):
+        
+        # 猎捕范围：查找所有快讯标题
+        items = soup.select('a.article-title')
+        
+        # 定义创业者关心的趋势关键词
+        growth_keywords = ['AI', '人工智能', '机器人', '数字化', '创业', '融资', '发布', '芯片', '模型', '增长', 'AIGC']
+        
+        for item in items:
+            title = clean_text(item.get_text(strip=True))
+            link = "https://36kr.com" + item['href']
+            
+            # 只要包含其中一个关键词，就抓取
+            if any(kw.lower() in title.lower() for kw in growth_keywords):
                 trends.append({
                     "title": title,
-                    "desc": "创业趋势快报",
-                    "source": "https://36kr.com" + title_elem['href']
+                    "desc": "💡 商业趋势快报",
+                    "source": link
                 })
-            if len(trends) >= max_items: break
-    except Exception as e: print(f"⚠️ 趋势捕获失败: {e}")
+            
+            if len(trends) >= max_items:
+                break
+                
+        # 兜底逻辑：如果正好这段时间没新闻，显示宏观趋势，不让页面空白
+        if not trends:
+            trends = [
+                {"title": "全球 AI 应用进入爆发期", "desc": "创业者需关注垂直赛道机会", "source": "https://36kr.com"},
+                {"title": "大模型降本增效成为企业共识", "desc": "降本工具需求量激增", "source": "https://36kr.com"}
+            ]
+    except Exception as e:
+        print(f"⚠️ 趋势捕获异常: {e}")
     return trends
 
 def main():
@@ -146,7 +163,8 @@ def main():
     data = {"cost": [], "efficiency": [], "trend": []}
     for t in unique_tools:
         cat = classify_tool(t['desc'], t['title'])
-        data[cat].append(t)
+        if cat in data:
+            data[cat].append(t)
 
     # 猎捕趋势
     data["trend"] = fetch_36kr_trends(6)
@@ -156,10 +174,13 @@ def main():
         data["cost"].append({"title": "Claude 3.5 Sonnet", "desc": "高性价比的智能模型，替代初级分析师", "source": "https://claude.ai"})
     
     # 写入 JSON
-    with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    try:
+        with open('data.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print(f"\n✅ 猎捕完成！数据已更新至 data.json")
+    except Exception as e:
+        print(f"❌ 写入文件失败: {e}")
     
-    print(f"\n✅ 猎捕完成！")
     print(f"💰 发现 {len(data['cost'])} 个降本工具")
     print(f"⚡ 发现 {len(data['efficiency'])} 个增效工具")
     print(f"📡 捕获 {len(data['trend'])} 条行业趋势")
