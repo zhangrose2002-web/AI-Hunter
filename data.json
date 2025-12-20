@@ -33,11 +33,6 @@
       "source": "https://ai-bot.cn/sites/4189.html"
     },
     {
-      "title": "TRAE编程",
-      "desc": "AI编程IDE，Vibe Coding 必备！",
-      "source": "https://www.trae.cn/?utm_source=advertising&utm_medium=aibot_ug_cpa&utm_term=hw_trae_aibot"
-    },
-    {
       "title": "AiPPT",
       "desc": "AI快速生成高质量PPT",
       "source": "https://www.aippt.cn/?utm_type=Navweb&utm_source=ai-bot&utm_page=aippt&utm_plan=ppt&utm_unit=AIPPT&utm_keyword=50608"
@@ -106,18 +101,18 @@
   "trend": [
     {
       "title": "💻 硬核 | 智谱上市招股书深度解读",
-      "desc": "V2EX 社区热议",
+      "desc": "社区热议",
       "source": "https://www.v2ex.com/t/1180086#reply1"
     },
     {
       "title": "💻 ChatGPT for Mac 常见无法复制问题",
-      "desc": "V2EX 社区热议",
+      "desc": "社区热议",
       "source": "https://www.v2ex.com/t/1180032#reply11"
     },
     {
-      "title": "💡 AI 创业者需关注：模型降本与 Agent 落地",
-      "desc": "行业分析",
-      "source": "https://36kr.com"
+      "title": "💻 同一种问题换两种问法会得到不同回复, 不同 AI 结果不同, 使用的时候还是得多切换着问",
+      "desc": "社区热议",
+      "source": "https://www.v2ex.com/t/1180123#reply0"
     }
   ]
 }
