@@ -26,6 +26,11 @@
       "title": "Canva Magic Studio",
       "desc": "用文字生成海报、PPT、社交媒体图",
       "source": "https://www.canva.com/magic-studio/"
+    },
+    {
+      "title": "Notion AI",
+      "desc": "智能整理笔记、生成待办、总结长文",
+      "source": "https://www.notion.so/product/ai"
     }
   ],
   "trend": [
