@@ -1,43 +1,127 @@
 {
   "cost": [
     {
-      "title": "Doubao (豆包)",
-      "desc": "免费 AI 助手，适用于客服与日常问答",
-      "source": "https://www.doubao.com"
+      "title": "绘蛙",
+      "desc": "AI电商营销工具，免费生成商品图",
+      "source": "https://ai-bot.cn/sites/9195.html"
     },
     {
-      "title": "WPS AI",
-      "desc": "自动化办公任务，降低软件采购与人力成本",
-      "source": "https://www.wps.cn/ai"
+      "title": "堆友AI",
+      "desc": "免费AI绘画和生图神器",
+      "source": "https://d.design/?from=ab13"
+    },
+    {
+      "title": "Flowith",
+      "desc": "免费用Gemini 3、GPT-5",
+      "source": "https://ai-bot.cn/sites/11395.html"
+    },
+    {
+      "title": "扣子空间",
+      "desc": "免费全能的AI办公智能体",
+      "source": "https://ai-bot.cn/sites/65797.html"
+    },
+    {
+      "title": "讯飞绘文",
+      "desc": "免费AI写作工具，5分钟生成一篇原创稿！",
+      "source": "https://ai-bot.cn/sites/6242.html"
     }
   ],
   "efficiency": [
     {
-      "title": "美图秀秀",
-      "desc": "AI 一键修图、抠图、美化，秒出专业效果",
-      "source": "https://xiuxiu.meitu.com"
+      "title": "豆包",
+      "desc": "智能对话助手，办公创作全能！",
+      "source": "https://ai-bot.cn/sites/4189.html"
     },
     {
-      "title": "通义千问 (Qwen)",
-      "desc": "自动生成周报、邮件、总结，提升写作效率",
-      "source": "https://qwen.ai"
+      "title": "TRAE编程",
+      "desc": "AI编程IDE，Vibe Coding 必备！",
+      "source": "https://www.trae.cn/?utm_source=advertising&utm_medium=aibot_ug_cpa&utm_term=hw_trae_aibot"
     },
     {
-      "title": "Canva Magic Studio",
-      "desc": "用文字生成海报、PPT、社交媒体图",
-      "source": "https://www.canva.com/magic-studio/"
+      "title": "AiPPT",
+      "desc": "AI快速生成高质量PPT",
+      "source": "https://www.aippt.cn/?utm_type=Navweb&utm_source=ai-bot&utm_page=aippt&utm_plan=ppt&utm_unit=AIPPT&utm_keyword=50608"
     },
     {
-      "title": "Notion AI",
-      "desc": "智能整理笔记、生成待办、总结长文",
-      "source": "https://www.notion.so/product/ai"
+      "title": "秘塔AI搜索",
+      "desc": "最好用的AI搜索工具，没有广告，直达结果",
+      "source": "https://metaso.cn/?s=aibot1&referrer_s=aibot1"
+    },
+    {
+      "title": "LiblibAI",
+      "desc": "一站式 AI 内容创作生成平台",
+      "source": "https://ai-bot.cn/sites/66771.html"
+    },
+    {
+      "title": "美图设计室",
+      "desc": "AI图像创作和设计平台",
+      "source": "https://www.designkit.com/tools?channel=10026"
+    },
+    {
+      "title": "办公小浣熊",
+      "desc": "最强AI数据分析助手",
+      "source": "https://ai-bot.cn/sites/8516.html"
+    },
+    {
+      "title": "响指HaiSnap",
+      "desc": "AI零代码应用开发平台，可视化编辑迭代",
+      "source": "https://ai-bot.cn/sites/64863.html"
+    },
+    {
+      "title": "Keevx声音克隆",
+      "desc": "Keevx推出的AI声音克隆工具",
+      "source": "https://ai-bot.cn/sites/68848.html"
+    },
+    {
+      "title": "猫头鹰AI网页订阅",
+      "desc": "一句话搞定任意网页的内容监控",
+      "source": "https://ai-bot.cn/sites/68533.html"
+    },
+    {
+      "title": "魔珐星云",
+      "desc": "具身智能3D数字人开放平台",
+      "source": "https://ai-bot.cn/sites/68669.html"
+    },
+    {
+      "title": "椒图AI",
+      "desc": "深度适配中文场景的AI修图智能体",
+      "source": "https://ai-bot.cn/sites/61891.html"
+    },
+    {
+      "title": "灵光",
+      "desc": "蚂蚁推出的AI对话与应用生成平台",
+      "source": "https://ai-bot.cn/sites/68455.html"
+    },
+    {
+      "title": "秒言AI语音输入法",
+      "desc": "AI语音输入工具，极速响应、精准识别",
+      "source": "https://ai-bot.cn/sites/68449.html"
+    },
+    {
+      "title": "蛙蛙写作",
+      "desc": "AI小说和内容创作工具",
+      "source": "https://ai-bot.cn/sites/8204.html"
+    },
+    {
+      "title": "笔灵AI写作",
+      "desc": "600+写作模板、AI一键生成论文/小说，论文降重降AI",
+      "source": "https://ibiling.cn/?from=ai-bot"
+    },
+    {
+      "title": "新华妙笔",
+      "desc": "新华社推出的体制内办公学习平台",
+      "source": "https://miaobi.xinhuaskl.com/?channel=shuzhi"
+    },
+    {
+      "title": "笔灵AI小说",
+      "desc": "AI一键写全篇+爆文拆解，搞定大纲、素材，新手写作过稿神器！",
+      "source": "https://ai-bot.cn/sites/22626.html"
+    },
+    {
+      "title": "稿定AI文案",
+      "desc": "小红书、公众号、短视频AI文案生成工具",
+      "source": "https://ai-bot.cn/sites/49483.html"
     }
   ],
-  "trend": [
-    {
-      "title": "全球 AI 应用加速落地",
-      "desc": "企业需求激增",
-      "source": "https://36kr.com"
-    }
-  ]
+  "trend": []
 }
