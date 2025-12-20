@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>AI Hunter | 用 AI 猎捕趋势</title>
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -20,7 +19,7 @@
             background-image: linear-gradient(135deg, #4f46e5 0%, #1e3a8a 100%);
         }
 
-        /* Tab 样式 */
+        /* Tab 样式 - 完全保留你原来的视觉设计 */
         .tab-nav-container {
             max-width: 600px;
             margin: 0 auto 2rem;
@@ -52,7 +51,7 @@
         }
 
         .tab-btn.active {
-            background: #4f46e5; /* indigo-600 */
+            background: #4f46e5; 
             color: white;
             box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
         }
@@ -73,24 +72,20 @@
 </head>
 <body>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
         <header class="flex justify-start items-center py-6 border-b border-gray-200">
             <div class="text-3xl font-extrabold text-indigo-600 tracking-tight">AI Hunter</div>
         </header>
 
-        <!-- Hero Section -->
         <div class="text-center py-16 sm:py-24 gradient-bg rounded-xl mt-8 shadow-2xl shadow-indigo-200">
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-4 leading-tight">
                 用 AI 猎捕趋势，<br>重塑您的商业效率
             </h1>
-            <p class="text-lg text-indigo-200 max-w-3xl mx-auto">
+            <p class="text-lg text-indigo-200 max-w-3xl mx-auto px-4">
                 精选 AI 工具与实战案例，助您<strong>降本、提效、看趋势</strong>。
             </p>
         </div>
 
-        <!-- Tab Navigation -->
         <div class="my-12">
-            <!-- 新版 Tab 容器 -->
             <div class="tab-nav-container">
                 <div class="flex justify-between">
                     <button class="tab-btn active" data-tab="cost">
@@ -105,32 +100,25 @@
                 </div>
             </div>
 
-            <!-- Tab Content -->
             <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-200">
 
-                <!-- 成本杀手 -->
                 <div id="cost" class="tab-content active">
                     <h3 class="text-2xl font-bold text-indigo-700 mb-4">💰 成本杀手</h3>
                     <ul id="cost-list" class="space-y-3 text-gray-700">
-                        <!-- 默认内容可保留，JS 会覆盖 -->
                         <li>• 加载中...</li>
                     </ul>
                 </div>
 
-                <!-- 效率倍增 -->
                 <div id="efficiency" class="tab-content">
                     <h3 class="text-2xl font-bold text-indigo-700 mb-4">⚡ 效率倍增</h3>
                     <ul id="efficiency-list" class="space-y-3 text-gray-700">
-                        <!-- 默认内容可保留，JS 会覆盖 -->
                         <li>• 加载中...</li>
                     </ul>
                 </div>
 
-                <!-- 趋势雷达 -->
                 <div id="trend" class="tab-content">
                     <h3 class="text-2xl font-bold text-indigo-700 mb-4">📡 趋势雷达</h3>
                     <ul id="trend-list" class="space-y-3 text-gray-700">
-                        <!-- 默认内容可保留，JS 会覆盖 -->
                         <li>• 加载中...</li>
                     </ul>
                 </div>
@@ -138,81 +126,67 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="text-center py-6 border-t border-gray-200 mt-12">
             <p class="text-sm text-gray-500">© 2025 AI Hunter. All Rights Reserved.</p>
         </footer>
     </div>
 
-    <!-- Tab 切换 JS -->
     <script>
         document.querySelectorAll('.tab-btn').forEach(button => {
             button.addEventListener('click', () => {
-                // 更新按钮激活状态
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-
-                // 显示对应内容
                 const tabId = button.getAttribute('data-tab');
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 document.getElementById(tabId).classList.add('active');
             });
         });
     </script>
+
     <script>
-      // 安全加载 data.json
-      fetch('./data.json?' + new Date().getTime()) // 加时间戳防缓存
+      fetch('./data.json?t=' + Date.now()) 
         .then(response => {
-          if (!response.ok) {
-            throw new Error('网络错误: ' + response.status);
-          }
+          if (!response.ok) throw new Error('网络错误');
           return response.json();
         })
         .then(data => {
-          console.log('成功加载数据:', data);
-
-          const categories = {
-            cost: 'cost-list',
-            efficiency: 'efficiency-list',
-            trend: 'trend-list'
-          };
+          console.log('数据已更新:', data);
+          const categories = { cost: 'cost-list', efficiency: 'efficiency-list', trend: 'trend-list' };
 
           Object.entries(categories).forEach(([key, id]) => {
             const container = document.getElementById(id);
             if (!container) return;
-
-            // 清空默认占位内容
             container.innerHTML = '';
 
             const items = data[key] || [];
             if (items.length === 0) {
-              container.innerHTML = '<li class="text-gray-500">暂无数据</li>';
+              container.innerHTML = '<li class="text-gray-400">📡 暂无最新趋势，捕获中...</li>';
               return;
             }
 
             items.forEach(item => {
               const li = document.createElement('li');
               li.className = 'leading-relaxed mb-3';
+              
+              // 自动适配 source 或 link 字段
+              const link = item.source || item.link || '#';
+              const description = item.desc || item.content || '暂无说明';
+
               li.innerHTML = `
-                • <a href="${item.source}" target="_blank" rel="noopener noreferrer" 
-                   class="font-medium text-indigo-600 hover:underline break-words">
+                • <a href="${link}" target="_blank" rel="noopener noreferrer" 
+                    class="font-medium text-indigo-600 hover:underline break-words">
                     ${item.title}
                   </a>
-                <div class="text-gray-500 text-sm mt-1">${item.desc}</div>
+                <div class="text-gray-500 text-sm mt-1">${description}</div>
               `;
               container.appendChild(li);
             });
           });
         })
-        .catch(error => {
-          console.error('❌ 数据加载失败:', error);
-          // 显示错误提示
+        .catch(err => {
+          console.error(err);
           document.querySelectorAll('[id$="-list"]').forEach(el => {
-            el.innerHTML = '<li class="text-red-500">⚠️ 数据加载失败，请稍后重试</li>';
+            el.innerHTML = '<li class="text-red-400">⚠️ 数据同步中，请刷新页面重试</li>';
           });
         });
     </script>
