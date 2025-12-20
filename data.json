@@ -1,36 +1,46 @@
 {
   "cost": [
     {
+      "title": "Doubao (豆包)",
+      "desc": "免费多模态 AI 助手，适合客服问答",
+      "source": "https://www.doubao.com"
+    },
+    {
+      "title": "WPS AI",
+      "desc": "自动化办公流程，减少人力重复操作",
+      "source": "https://www.wps.cn/ai"
+    },
+    {
+      "title": "Tidbyt",
+      "desc": "开源硬件看板，替代昂贵 SaaS 监控工具",
+      "source": "https://tidbyt.com"
+    },
+    {
+      "title": "Zapier",
+      "desc": "连接不同 App 自动化工作流，节省开发成本",
+      "source": "https://zapier.com"
+    }
+  ],
+  "efficiency": [
+    {
+      "title": "✅ 数据已更新 [12-20 18:18 UTC]",
+      "desc": "GitHub Actions 自动同步成功",
+      "source": "#"
+    },
+    {
+      "title": "豆包",
+      "desc": "智能对话助手，办公创作全能！",
+      "source": "https://ai-bot.cn/sites/4189.html"
+    },
+    {
       "title": "绘蛙",
       "desc": "AI电商营销工具，免费生成商品图",
       "source": "https://ai-bot.cn/sites/9195.html"
     },
     {
-      "title": "堆友AI",
-      "desc": "免费AI绘画和生图神器",
-      "source": "https://d.design/?from=ab13"
-    },
-    {
-      "title": "Flowith",
-      "desc": "免费用Gemini 3、GPT-5",
-      "source": "https://ai-bot.cn/sites/11395.html"
-    },
-    {
-      "title": "扣子空间",
-      "desc": "免费全能的AI办公智能体",
-      "source": "https://ai-bot.cn/sites/65797.html"
-    },
-    {
-      "title": "讯飞绘文",
-      "desc": "免费AI写作工具，5分钟生成一篇原创稿！",
-      "source": "https://ai-bot.cn/sites/6242.html"
-    }
-  ],
-  "efficiency": [
-    {
-      "title": "豆包",
-      "desc": "智能对话助手，办公创作全能！",
-      "source": "https://ai-bot.cn/sites/4189.html"
+      "title": "TRAE编程",
+      "desc": "AI编程IDE，Vibe Coding 必备！",
+      "source": "https://www.trae.cn/?utm_source=advertising&utm_medium=aibot_ug_cpa&utm_term=hw_trae_aibot"
     },
     {
       "title": "AiPPT",
@@ -48,9 +58,19 @@
       "source": "https://ai-bot.cn/sites/66771.html"
     },
     {
+      "title": "堆友AI",
+      "desc": "免费AI绘画和生图神器",
+      "source": "https://d.design/?from=ab13"
+    },
+    {
       "title": "美图设计室",
       "desc": "AI图像创作和设计平台",
       "source": "https://www.designkit.com/tools?channel=10026"
+    },
+    {
+      "title": "Flowith",
+      "desc": "免费用Gemini 3、GPT-5",
+      "source": "https://ai-bot.cn/sites/11395.html"
     },
     {
       "title": "办公小浣熊",
@@ -61,6 +81,11 @@
       "title": "响指HaiSnap",
       "desc": "AI零代码应用开发平台，可视化编辑迭代",
       "source": "https://ai-bot.cn/sites/64863.html"
+    },
+    {
+      "title": "扣子空间",
+      "desc": "免费全能的AI办公智能体",
+      "source": "https://ai-bot.cn/sites/65797.html"
     },
     {
       "title": "Keevx声音克隆",
@@ -96,23 +121,68 @@
       "title": "蛙蛙写作",
       "desc": "AI小说和内容创作工具",
       "source": "https://ai-bot.cn/sites/8204.html"
+    },
+    {
+      "title": "讯飞绘文",
+      "desc": "免费AI写作工具，5分钟生成一篇原创稿！",
+      "source": "https://ai-bot.cn/sites/6242.html"
+    },
+    {
+      "title": "Gamma.app",
+      "desc": "用一句话生成 PPT、文档或网页，无需设计",
+      "source": "https://gamma.app"
+    },
+    {
+      "title": "Runway ML",
+      "desc": "AI 视频编辑：文本生成视频、绿幕抠像、运动追踪",
+      "source": "https://runwayml.com"
+    },
+    {
+      "title": "HeyGen",
+      "desc": "创建 AI 数字人视频，支持多语言口型同步",
+      "source": "https://www.heygen.com"
+    },
+    {
+      "title": "ElevenLabs",
+      "desc": "超拟真 AI 语音合成，支持情感与多语种",
+      "source": "https://elevenlabs.io"
+    },
+    {
+      "title": "Notion AI",
+      "desc": "智能笔记助手：总结、扩写、翻译、生成待办",
+      "source": "https://www.notion.so/product/ai"
+    },
+    {
+      "title": "Otter.ai",
+      "desc": "实时语音转文字，自动生成会议摘要",
+      "source": "https://otter.ai"
+    },
+    {
+      "title": "Canva Magic Studio",
+      "desc": "AI 设计套件：文生图、背景移除、文案生成",
+      "source": "https://www.canva.com/magic-studio/"
+    },
+    {
+      "title": "Perplexity AI",
+      "desc": "会联网的答案引擎，替代传统搜索",
+      "source": "https://www.perplexity.ai"
+    },
+    {
+      "title": "Loom AI",
+      "desc": "录制视频时自动生成摘要、章节和行动项",
+      "source": "https://www.loom.com"
+    },
+    {
+      "title": "Fireflies.ai",
+      "desc": "自动记录并分析 Zoom/Teams 会议内容",
+      "source": "https://fireflies.ai"
     }
   ],
   "trend": [
     {
-      "title": "💻 硬核 | 智谱上市招股书深度解读",
-      "desc": "社区热议",
-      "source": "https://www.v2ex.com/t/1180086#reply1"
-    },
-    {
-      "title": "💻 ChatGPT for Mac 常见无法复制问题",
-      "desc": "社区热议",
-      "source": "https://www.v2ex.com/t/1180032#reply11"
-    },
-    {
-      "title": "💻 同一种问题换两种问法会得到不同回复, 不同 AI 结果不同, 使用的时候还是得多切换着问",
-      "desc": "社区热议",
-      "source": "https://www.v2ex.com/t/1180123#reply0"
+      "title": "全球 AI 应用加速落地",
+      "desc": "企业需求激增",
+      "source": "https://36kr.com"
     }
   ]
 }
