@@ -27,7 +27,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Auto update data" || echo "No changes to commit"
-          git pull --rebase  # 确保在 push 之前同步云端代码
-          git push
+          git add data.json
+          # 只有在有变动时才 commit，防止空报错
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update data" && git pull --rebase origin main && git push)
