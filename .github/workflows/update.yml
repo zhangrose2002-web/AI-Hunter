@@ -32,7 +32,7 @@ jobs:
           git pull --rebase origin main
           git push origin main
 
-        - name: 🚀 部署到我的空间
+      - name: 🚀 部署到我的空间
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}    # 你的空间 FTP 地址
