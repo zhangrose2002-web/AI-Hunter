@@ -1,26 +1,38 @@
-[
-  {
-    "id": 1,
-    "name": "通义千问",
-    "url": "https://qwen.ai",
-    "category": "大模型",
-    "description": "阿里巴巴推出的超大规模语言模型，支持多语言、多模态。",
-    "tags": ["中文", "免费", "API"]
-  },
-  {
-    "id": 2,
-    "name": "ChatGPT",
-    "url": "https://chat.openai.com",
-    "category": "AI助手",
-    "description": "OpenAI 开发的对话式 AI，广泛用于写作、编程、创意等场景。",
-    "tags": ["英文", "付费", "插件"]
-  },
-  {
-    "id": 3,
-    "name": "Notion AI",
-    "url": "https://www.notion.so/product/ai",
-    "category": "生产力工具",
-    "description": "集成在 Notion 中的 AI 功能，可总结、改写、生成内容。",
-    "tags": ["写作", "笔记", "团队协作"]
-  }
-]
+{
+  "cost": [
+    {
+      "title": "Doubao (豆包)",
+      "desc": "免费 AI 助手，适用于客服与日常问答",
+      "source": "https://www.doubao.com"
+    },
+    {
+      "title": "WPS AI",
+      "desc": "自动化办公任务，降低软件采购与人力成本",
+      "source": "https://www.wps.cn/ai"
+    }
+  ],
+  "efficiency": [
+    {
+      "title": "美图秀秀",
+      "desc": "AI 一键修图、抠图、美化，秒出专业效果",
+      "source": "https://xiuxiu.meitu.com"
+    },
+    {
+      "title": "通义千问 (Qwen)",
+      "desc": "自动生成周报、邮件、总结，提升写作效率",
+      "source": "https://qwen.ai"
+    },
+    {
+      "title": "Canva Magic Studio",
+      "desc": "用文字生成海报、PPT、社交媒体图",
+      "source": "https://www.canva.com/magic-studio/"
+    }
+  ],
+  "trend": [
+    {
+      "title": "全球 AI 应用加速落地",
+      "desc": "企业需求激增",
+      "source": "https://36kr.com"
+    }
+  ]
+}
