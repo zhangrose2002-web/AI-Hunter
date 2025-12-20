@@ -2,41 +2,58 @@ name: Auto Update AI Tools
 
 on:
   schedule:
-    - cron: '0 0,6,12,18 * * *'  # 每周日 UTC 00:00（北京时间 周日早8点）
-  workflow_dispatch:     # 允许手动触发
+    - cron: '0 0,6,12,18 * * *'  # 每天 UTC 0/6/12/18 点（北京时间 +8）
+  workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # 允许 push 回仓库
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: 🔧 Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml
+          pip install requests beautifulsoup4 lxml --quiet
 
-      - name: Run crawler
+      - name: 🕷️ Run crawler
         run: python crawler_cn.py
 
-      - name: Commit and push if changed
+      - name: 💾 Commit and push if changed
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 仅当 data.json 有变化时才提交
           git add data.json
-          git commit -m "Auto update trends and tools" || exit 0
-          git pull --rebase origin main
-          git push origin main
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto update: $(date -u)"
+            git push origin main
+            echo "✅ Changes pushed."
+          else
+            echo "ℹ️ No changes in data.json. Skip commit."
+          fi
 
-      - name: 🚀 部署到我的空间
+      - name: 🚀 Deploy to FTP (only essential files)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_SERVER }}    # 你的空间 FTP 地址
-          username: ${{ secrets.FTP_USERNAME }} # FTP 用户名
-          password: ${{ secrets.FTP_PASSWORD }} # FTP 密码
-          local-dir: ./                        # 上传当前目录所有文件
-          server-dir: /wwwroot/ai-hunter/      # 你的空间目标文件夹
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /wwwroot/ai-hunter/
+          # 只上传网站所需文件，排除敏感/无用文件
+          exclude:
+            - .git*
+            - .github/
+            - *.py
+            - README.md
+            - LICENSE
+            - __pycache__/
