@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [12-24 06:24 UTC]",
+      "title": "✅ 数据已更新 [12-24 12:29 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -63,14 +63,14 @@
       "source": "https://d.design/?from=ab13"
     },
     {
-      "title": "美图设计室",
-      "desc": "AI图像创作和设计平台",
-      "source": "https://www.designkit.com/tools?channel=10026"
-    },
-    {
       "title": "Flowith",
       "desc": "免费用Gemini 3、GPT-5",
       "source": "https://ai-bot.cn/sites/11395.html"
+    },
+    {
+      "title": "美图设计室",
+      "desc": "AI图像创作和设计平台",
+      "source": "https://www.designkit.com/tools?channel=10026"
     },
     {
       "title": "办公小浣熊",
@@ -86,6 +86,11 @@
       "title": "扣子空间",
       "desc": "免费全能的AI办公智能体",
       "source": "https://ai-bot.cn/sites/65797.html"
+    },
+    {
+      "title": "妙话AI",
+      "desc": "专为内容创作者设计的创意图片生成工具",
+      "source": "https://ai-bot.cn/sites/68984.html"
     },
     {
       "title": "Diagrimo",
@@ -111,11 +116,6 @@
       "title": "Keevx声音克隆",
       "desc": "Keevx推出的AI声音克隆工具",
       "source": "https://ai-bot.cn/sites/68848.html"
-    },
-    {
-      "title": "猫头鹰AI网页订阅",
-      "desc": "一句话搞定任意网页的内容监控",
-      "source": "https://ai-bot.cn/sites/68533.html"
     },
     {
       "title": "蛙蛙写作",
