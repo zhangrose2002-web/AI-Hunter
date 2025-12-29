@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [12-29 01:15 UTC]",
+      "title": "✅ 数据已更新 [12-29 06:25 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,11 @@
       "source": "https://ai-bot.cn/sites/65797.html"
     },
     {
+      "title": "01Agent",
+      "desc": "AI图文创作智能体，支持生成、排版、编辑、发布",
+      "source": "https://ai-bot.cn/sites/69212.html"
+    },
+    {
       "title": "亿话",
       "desc": "数字人对话智能体创作平台",
       "source": "https://ai-bot.cn/sites/69201.html"
@@ -111,11 +116,6 @@
       "title": "Diagrimo",
       "desc": "Tenorshare AI推出的AI图表生成工具",
       "source": "https://ai-bot.cn/sites/68868.html"
-    },
-    {
-      "title": "Local Banana",
-      "desc": "专注于AI图像Prompt收集与结构化的平台",
-      "source": "https://ai-bot.cn/sites/68915.html"
     },
     {
       "title": "蛙蛙写作",
