@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-05 06:29 UTC]",
+      "title": "✅ 数据已更新 [01-05 12:32 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,11 @@
       "source": "https://ai-bot.cn/sites/65797.html"
     },
     {
+      "title": "imgak",
+      "desc": "一站式在线 AI 图像处理平台",
+      "source": "https://ai-bot.cn/sites/69515.html"
+    },
+    {
       "title": "AnyGen",
       "desc": "字节跳动推出的AI办公智能体",
       "source": "https://ai-bot.cn/sites/69424.html"
@@ -111,11 +116,6 @@
       "title": "课灵 PPT",
       "desc": "AI免费生成PPT课件",
       "source": "https://ai-bot.cn/sites/69127.html"
-    },
-    {
-      "title": "Zcode",
-      "desc": "智谱推出的轻量级AI IDE编程工具",
-      "source": "https://ai-bot.cn/sites/69134.html"
     },
     {
       "title": "蛙蛙写作",
