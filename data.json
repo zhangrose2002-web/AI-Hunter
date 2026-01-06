@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-06 06:24 UTC]",
+      "title": "✅ 数据已更新 [01-06 12:31 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,11 @@
       "source": "https://ai-bot.cn/sites/65797.html"
     },
     {
+      "title": "ChartGen",
+      "desc": "AI图表生成工具，快速生成专业图表",
+      "source": "https://ai-bot.cn/sites/69545.html"
+    },
+    {
       "title": "多维视界",
       "desc": "一站式AI音视频智能分析平台",
       "source": "https://ai-bot.cn/sites/69537.html"
@@ -111,11 +116,6 @@
       "title": "01Agent",
       "desc": "AI图文创作智能体，支持生成、排版、编辑、发布",
       "source": "https://ai-bot.cn/sites/69212.html"
-    },
-    {
-      "title": "亿话",
-      "desc": "数字人对话智能体创作平台",
-      "source": "https://ai-bot.cn/sites/69201.html"
     },
     {
       "title": "蛙蛙写作",
