@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-07 06:24 UTC]",
+      "title": "✅ 数据已更新 [01-07 12:31 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,11 @@
       "source": "https://ai-bot.cn/sites/65797.html"
     },
     {
+      "title": "MochiAni",
+      "desc": "AI动画视频创作工具",
+      "source": "https://ai-bot.cn/sites/69647.html"
+    },
+    {
       "title": "云幕同声",
       "desc": "专业AI视频翻译，短剧出海、跨境电商，效果超棒！",
       "source": "https://ai-bot.cn/sites/69629.html"
@@ -111,11 +116,6 @@
       "title": "AnyGen",
       "desc": "字节跳动推出的AI办公智能体",
       "source": "https://ai-bot.cn/sites/69424.html"
-    },
-    {
-      "title": "InfCode",
-      "desc": "词元无限推出的企业级AI编程工具",
-      "source": "https://ai-bot.cn/sites/69316.html"
     },
     {
       "title": "蛙蛙写作",
