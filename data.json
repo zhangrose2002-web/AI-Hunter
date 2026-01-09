@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-09 06:24 UTC]",
+      "title": "✅ 数据已更新 [01-09 12:31 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,16 @@
       "source": "https://ai-bot.cn/sites/65909.html"
     },
     {
+      "title": "潮际好麦",
+      "desc": "AI赋能电商视觉革命，一站式智能商拍平台",
+      "source": "https://ai-bot.cn/sites/69883.html"
+    },
+    {
+      "title": "OpenCode",
+      "desc": "开源 AI 编程工具 ， Claude Code 最佳平替",
+      "source": "https://ai-bot.cn/sites/69806.html"
+    },
+    {
       "title": "MochiAni",
       "desc": "AI动画视频创作工具",
       "source": "https://ai-bot.cn/sites/69647.html"
@@ -106,16 +116,6 @@
       "title": "多维视界",
       "desc": "一站式AI音视频智能分析平台",
       "source": "https://ai-bot.cn/sites/69537.html"
-    },
-    {
-      "title": "imgAK",
-      "desc": "一站式在线 AI 图像处理平台",
-      "source": "https://ai-bot.cn/sites/69515.html"
-    },
-    {
-      "title": "AnyGen",
-      "desc": "字节跳动推出的AI办公智能体",
-      "source": "https://ai-bot.cn/sites/69424.html"
     },
     {
       "title": "蛙蛙写作",
@@ -180,9 +180,9 @@
   ],
   "trend": [
     {
-      "title": "全球 AI 应用加速落地",
-      "desc": "企业需求激增",
-      "source": "https://36kr.com"
+      "title": "趋势加载中...",
+      "desc": "请稍后刷新",
+      "source": "#"
     }
   ]
 }
