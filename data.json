@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-12 06:27 UTC]",
+      "title": "✅ 数据已更新 [01-12 12:33 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -63,14 +63,14 @@
       "source": "https://d.design/?from=ab13"
     },
     {
-      "title": "Flowith",
-      "desc": "免费用Gemini 3、GPT-5",
-      "source": "https://ai-bot.cn/sites/11395.html"
-    },
-    {
       "title": "美图设计室",
       "desc": "AI图像创作和设计平台",
       "source": "https://www.designkit.com/tools?channel=10026"
+    },
+    {
+      "title": "Flowith",
+      "desc": "免费用Gemini 3、GPT-5",
+      "source": "https://ai-bot.cn/sites/11395.html"
     },
     {
       "title": "办公小浣熊",
@@ -86,6 +86,11 @@
       "title": "秒哒",
       "desc": "百度推出的无代码AI应用开发平台",
       "source": "https://ai-bot.cn/sites/65909.html"
+    },
+    {
+      "title": "抠抠图",
+      "desc": "免费在线AI抠图工具，一键批量抠图",
+      "source": "https://ai-bot.cn/sites/70008.html"
     },
     {
       "title": "NextCut AI",
@@ -111,11 +116,6 @@
       "title": "云幕同声",
       "desc": "专业AI视频翻译，短剧出海、跨境电商，效果超棒！",
       "source": "https://ai-bot.cn/sites/69629.html"
-    },
-    {
-      "title": "ChartGen",
-      "desc": "AI图表生成工具，快速生成专业图表",
-      "source": "https://ai-bot.cn/sites/69545.html"
     },
     {
       "title": "蛙蛙写作",
