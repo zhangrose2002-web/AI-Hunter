@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-13 06:24 UTC]",
+      "title": "✅ 数据已更新 [01-13 12:32 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -65,7 +65,7 @@
     {
       "title": "美图设计室",
       "desc": "AI图像创作和设计平台",
-      "source": "https://www.designkit.com/tools?channel=10026"
+      "source": "https://www.designkit.cn/?channel=10026"
     },
     {
       "title": "Flowith",
@@ -86,6 +86,11 @@
       "title": "秒哒",
       "desc": "百度推出的无代码AI应用开发平台",
       "source": "https://ai-bot.cn/sites/65909.html"
+    },
+    {
+      "title": "Atoms",
+      "desc": "第一支自动构建真实业务的 AI 团队",
+      "source": "https://ai-bot.cn/sites/70016.html"
     },
     {
       "title": "秒绘AI",
@@ -111,11 +116,6 @@
       "title": "潮际好麦",
       "desc": "AI赋能电商视觉革命，一站式智能商拍平台",
       "source": "https://ai-bot.cn/sites/69883.html"
-    },
-    {
-      "title": "OpenCode",
-      "desc": "开源 AI 编程工具 ， Claude Code 最佳平替",
-      "source": "https://ai-bot.cn/sites/69806.html"
     },
     {
       "title": "蛙蛙写作",
