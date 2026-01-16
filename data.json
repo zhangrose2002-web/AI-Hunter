@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-16 01:11 UTC]",
+      "title": "✅ 数据已更新 [01-16 06:24 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,11 @@
       "source": "https://ai-bot.cn/sites/65909.html"
     },
     {
+      "title": "Neural4D",
+      "desc": "AI一站式3D模型生成平台",
+      "source": "https://ai-bot.cn/sites/70251.html"
+    },
+    {
       "title": "献丑AI",
       "desc": "首个 AI 视频开源社区，支持一键Fork与共创",
       "source": "https://ai-bot.cn/sites/70208.html"
@@ -111,11 +116,6 @@
       "title": "呜哩",
       "desc": "阿里推出的AIGC创意生产力平台",
       "source": "https://ai-bot.cn/sites/70059.html"
-    },
-    {
-      "title": "抠抠图",
-      "desc": "免费在线AI抠图工具，一键批量抠图",
-      "source": "https://ai-bot.cn/sites/70008.html"
     },
     {
       "title": "蛙蛙写作",
