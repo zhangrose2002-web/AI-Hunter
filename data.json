@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-20 06:26 UTC]",
+      "title": "✅ 数据已更新 [01-20 12:34 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,11 @@
       "source": "https://ai-bot.cn/sites/11395.html"
     },
     {
+      "title": "材料星AI",
+      "desc": "专为秘书工作设计的AI写作工具",
+      "source": "https://ai-bot.cn/sites/70397.html"
+    },
+    {
       "title": "Kilo Code",
       "desc": "开源的 AI 编程扩展插件",
       "source": "https://ai-bot.cn/sites/69903.html"
@@ -111,11 +116,6 @@
       "title": "Typeless",
       "desc": "AI语音输入工具，智能上下文润色",
       "source": "https://ai-bot.cn/sites/69958.html"
-    },
-    {
-      "title": "Atoms",
-      "desc": "第一支自动构建真实业务的 AI 团队",
-      "source": "https://ai-bot.cn/sites/70016.html"
     },
     {
       "title": "蛙蛙写作",
