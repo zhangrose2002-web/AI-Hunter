@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-21 06:26 UTC]",
+      "title": "✅ 数据已更新 [01-21 12:34 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,11 @@
       "source": "https://ai-bot.cn/sites/11395.html"
     },
     {
+      "title": "MonkeyCode",
+      "desc": "长亭科技开源的 AI 编程助手与企业级开发平台",
+      "source": "https://ai-bot.cn/sites/70526.html"
+    },
+    {
       "title": "YouWare",
       "desc": "一站式 AI 编程社区与开发平台",
       "source": "https://ai-bot.cn/sites/70432.html"
@@ -111,11 +116,6 @@
       "title": "Kilo Code",
       "desc": "开源的 AI 编程扩展插件",
       "source": "https://ai-bot.cn/sites/69903.html"
-    },
-    {
-      "title": "LuxReal",
-      "desc": "群核科技推出的AI 3D视频创作平台",
-      "source": "https://ai-bot.cn/sites/69990.html"
     },
     {
       "title": "蛙蛙写作",
