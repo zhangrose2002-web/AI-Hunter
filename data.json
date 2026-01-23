@@ -23,7 +23,7 @@
   ],
   "efficiency": [
     {
-      "title": "✅ 数据已更新 [01-23 06:25 UTC]",
+      "title": "✅ 数据已更新 [01-23 12:33 UTC]",
       "desc": "GitHub Actions 自动同步成功",
       "source": "#"
     },
@@ -88,6 +88,21 @@
       "source": "https://ai-bot.cn/sites/11395.html"
     },
     {
+      "title": "SpeedAI",
+      "desc": "AI科研助手，AIGC检测、降重降AI率",
+      "source": "https://ai-bot.cn/sites/70682.html"
+    },
+    {
+      "title": "视觉工厂",
+      "desc": "AI创作工具，支持AI生图和视频生成服务",
+      "source": "https://ai-bot.cn/sites/70659.html"
+    },
+    {
+      "title": "MetaLaw",
+      "desc": "AI法律类案检索与分析助手",
+      "source": "https://ai-bot.cn/sites/70602.html"
+    },
+    {
       "title": "MonkeyCode",
       "desc": "长亭科技开源的 AI 编程助手与企业级开发平台",
       "source": "https://ai-bot.cn/sites/70526.html"
@@ -101,21 +116,6 @@
       "title": "TurboScribe",
       "desc": "专业 AI 音视频转文字工具",
       "source": "https://ai-bot.cn/sites/69917.html"
-    },
-    {
-      "title": "Loom",
-      "desc": "AI 屏幕录制与视频分享工具",
-      "source": "https://ai-bot.cn/sites/69878.html"
-    },
-    {
-      "title": "材料星AI",
-      "desc": "专为秘书工作设计的AI写作工具",
-      "source": "https://ai-bot.cn/sites/70397.html"
-    },
-    {
-      "title": "Kilo Code",
-      "desc": "开源的 AI 编程扩展插件",
-      "source": "https://ai-bot.cn/sites/69903.html"
     },
     {
       "title": "蛙蛙写作",
