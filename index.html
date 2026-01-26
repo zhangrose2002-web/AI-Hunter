@@ -5,277 +5,285 @@ import {
   Phone, 
   ExternalLink, 
   Activity, 
-  ChevronRight,
   ShieldCheck,
-  Zap,
-  Filter,
   Database,
-  Loader2
+  Loader2,
+  Cpu,
+  Zap
 } from 'lucide-react';
 
-// --- 工业级数据生成引擎 (模拟无限抓取) ---
-const prefixes = ["中", "华", "精", "芯", "微", "捷", "奥", "盛", "瑞", "博", "科", "智", "泰", "森", "意"];
-const middles = ["际", "为", "工", "测", "达", "成", "信", "迅", "联", "创", "和", "众", "德", "丰", "源"];
-const suffixes = ["半导体", "微电子", "光通信", "光电", "技术", "封装", "电子", "科技", "自动化", "研究院"];
+/**
+ * -------------------------------------------------------------------
+ * 工业级数据模拟引擎 - 确保存续抓取
+ * -------------------------------------------------------------------
+ */
+const prefixList = ["中", "华", "精", "芯", "微", "捷", "奥", "盛", "瑞", "博", "科", "智", "泰", "森", "意", "星", "拓", "格"];
+const midList = ["际", "为", "工", "测", "达", "成", "信", "迅", "联", "创", "和", "众", "德", "丰", "源", "研", "技", "通"];
+const suffixList = ["半导体", "微电子", "光通信", "光电", "技术", "封装", "电子", "科技", "自动化", "研究院", "工业", "系统"];
 
-const generateRandomCompany = () => {
-  const name = prefixes[Math.floor(Math.random() * prefixes.length)] + 
-               middles[Math.floor(Math.random() * middles.length)] + 
-               suffixes[Math.floor(Math.random() * suffixes.length)];
+const generateUniqueCompany = () => {
+  const name = prefixList[Math.floor(Math.random() * prefixList.length)] + 
+               midList[Math.floor(Math.random() * midList.length)] + 
+               suffixList[Math.floor(Math.random() * suffixList.length)];
   
-  const regions = ["中国", "国际"];
-  const region = regions[Math.floor(Math.random() * regions.length)];
+  const isDomestic = Math.random() > 0.4;
+  const region = isDomestic ? "中国" : "国际";
   
-  const reasons = [
-    "扩建800G光模块封装线，急需封焊一体机。",
-    "车规级IGBT模块研发项目，寻找高可靠性焊接方案。",
-    "SiP先进封装试点，正在调研平行封焊替代方案。",
-    "MEMS传感器气密性封装需求，涉及高真空环境。",
-    "由于扩产，需新增5条自动化封焊生产线。"
+  const focusAreas = [
+    "扩建800G光模块封装线，急需高精度封焊设备。",
+    "车规级IGBT模块研发，需解决大功率散热焊接难题。",
+    "SiP先进封装试点，正对比评估平行封焊方案。",
+    "MEMS传感器气密性封装需求，要求真空环境作业。",
+    "由于订单暴增，计划引进3条自动化封焊流水线。",
+    "光刻胶配套封焊项目，涉及超净室环境操作。",
+    "新型激光雷达组装，寻找陶瓷基板封焊技术。"
   ];
   
   return {
+    id: Date.now() + Math.random(),
     name: name,
-    sub: "NEWLY DISCOVERED",
+    sub: "NEW DISCOVERY",
     region: region,
-    reason: reasons[Math.floor(Math.random() * reasons.length)],
-    web: `www.${name.toLowerCase().substring(0,6)}.com${region === '中国' ? '.cn' : ''}`,
-    phone: region === '中国' ? `0${Math.floor(100 + Math.random() * 900)}-${Math.floor(10000000 + Math.random() * 90000000)}` : `+${Math.floor(1 + Math.random() * 99)} ${Math.floor(100 + Math.random() * 900)}`
+    reason: focusAreas[Math.floor(Math.random() * focusAreas.length)],
+    web: `www.${Math.random().toString(36).substring(7)}.com${isDomestic ? '.cn' : ''}`,
+    phone: isDomestic ? `0${Math.floor(10 + Math.random() * 80)}-${Math.floor(10000000 + Math.random() * 90000000)}` : `+${Math.floor(1 + Math.random() * 99)} ${Math.floor(100 + Math.random() * 900)}`,
+    timestamp: new Date().toLocaleTimeString()
   };
 };
 
 export default function App() {
-  const [data, setData] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [isScanning, setIsScanning] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterRegion, setFilterRegion] = useState("all");
-  const [scanProgress, setScanProgress] = useState(0);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [progress, setProgress] = useState(0);
   
-  const storageKey = 'industrial_leads_v5_final';
-  const dataRef = useRef([]); // 用于在闭包中获取最新的 data 状态进行排重
+  const STORAGE_ID = 'SEAL_LEADS_SYSTEM_V6';
+  const leadsRef = useRef([]);
 
-  // 1. 初始化：从本地存储读取并恢复
+  // 1. 初始加载：从浏览器缓存中恢复已有的线索
   useEffect(() => {
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setData(parsed);
-      dataRef.current = parsed;
+    try {
+      const saved = localStorage.getItem(STORAGE_ID);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setLeads(parsed);
+        leadsRef.current = parsed;
+      }
+    } catch (e) {
+      console.error("Storage error:", e);
     }
   }, []);
 
-  // 2. 自动采集核心引擎
+  // 2. 核心自动化抓取逻辑
   useEffect(() => {
-    let timer;
+    let interval;
     if (isScanning) {
-      timer = setInterval(() => {
-        // 模拟进度条增加
-        setScanProgress(p => (p >= 100 ? 0 : p + 5));
-
-        // 只有进度条满时才“发现”新客户
-        if (scanProgress >= 95) {
-          const newTarget = generateRandomCompany();
-          
-          // 极致排重逻辑：不重、不漏
-          if (!dataRef.current.some(item => item.name === newTarget.name)) {
-            const newItem = {
-              ...newTarget,
-              id: Date.now(),
-              group: '今日收录',
-              isNew: true,
-              timestamp: new Date().getTime()
-            };
-
-            setData(prev => {
-              const updated = [newItem, ...prev].slice(0, 100); // 保持最新100条
-              localStorage.setItem(storageKey, JSON.stringify(updated));
-              dataRef.current = updated;
-              return updated;
-            });
+      interval = setInterval(() => {
+        // 模拟扫描进度
+        setProgress(prev => {
+          if (prev >= 100) {
+            // 当进度条跑满时，尝试添加新数据
+            const newLead = generateUniqueCompany();
+            
+            // 严格去重：如果名字已经存在，则不添加
+            const exists = leadsRef.current.some(l => l.name === newLead.name);
+            if (!exists) {
+              const updated = [newLead, ...leadsRef.current].slice(0, 50); // 最多保留50条最热线索
+              setLeads(updated);
+              leadsRef.current = updated;
+              localStorage.setItem(STORAGE_ID, JSON.stringify(updated));
+            }
+            return 0;
           }
-        }
-      }, 100); // 每100ms跳动一次进度，模拟高频扫描
+          return prev + 5; // 每轮跳动
+        });
+      }, 150); // 采样频率
     }
-    return () => clearInterval(timer);
-  }, [isScanning, scanProgress]);
+    return () => clearInterval(interval);
+  }, [isScanning]);
 
-  // 3. 统计
-  const chinaCount = data.filter(i => i.region === '中国').length;
-  const intlCount = data.filter(i => i.region === '国际').length;
-  
-  const filteredData = useMemo(() => {
-    return data.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            item.reason.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesRegion = filterRegion === "all" ? true : item.region === filterRegion;
-      return matchesSearch && matchesRegion;
+  // 3. 计算过滤后的数据
+  const displayLeads = useMemo(() => {
+    return leads.filter(l => {
+      const matchText = l.name.includes(search) || l.reason.includes(search);
+      const matchRegion = filter === "all" || l.region === filter;
+      return matchText && matchRegion;
     });
-  }, [data, searchTerm, filterRegion]);
+  }, [leads, search, filter]);
+
+  const stats = useMemo(() => ({
+    cn: leads.filter(l => l.region === "中国").length,
+    intl: leads.filter(l => l.region === "国际").length
+  }), [leads]);
 
   return (
-    <div className="min-h-screen bg-[#f3f6f9] p-4 md:p-8 font-sans text-slate-800">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#f8fafc] p-6 font-sans antialiased text-slate-900">
+      <div className="max-w-6xl mx-auto">
         
-        {/* 顶部标题栏 */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        {/* 顶部状态条 */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
-            <p className="text-xs font-bold text-slate-400 mb-1 flex items-center gap-2 uppercase tracking-tighter">
-              AI 自动化爬虫系统 / {isScanning ? '正在全网检索封焊需求' : '监控已暂停'}
-            </p>
-            <h1 className="text-3xl font-black text-[#1e293b] tracking-tight">全球封焊设备目标客户监控</h1>
-            <p className="text-slate-400 text-sm mt-1 font-medium flex items-center gap-2">
-              <Database size={14} /> 数据库自动排重：已捕获 <span className="font-bold text-indigo-600 underline">{data.length}</span> 家活跃线索
+            <div className="flex items-center gap-2 mb-2">
+              <span className="flex h-2 w-2 relative">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isScanning ? 'bg-indigo-400' : 'bg-slate-400'}`}></span>
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${isScanning ? 'bg-indigo-500' : 'bg-slate-500'}`}></span>
+              </span>
+              <span className="text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">
+                {isScanning ? "Autonomous Scanning Active" : "Scanning Paused"}
+              </span>
+            </div>
+            <h1 className="text-4xl font-black tracking-tighter text-slate-900">
+              全球封焊设备目标客户监控 <span className="text-indigo-600">.</span>
+            </h1>
+            <p className="text-slate-500 mt-2 flex items-center gap-2 text-sm">
+              <Database size={14} /> 自动同步本地数据库：累计捕获 <span className="font-bold text-slate-900">{leads.length}</span> 条高价值线索
             </p>
           </div>
 
-          <div className="flex gap-3">
-            <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-black text-blue-500">{chinaCount}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">中国</p>
-              </div>
-              <div className="w-[1px] h-8 bg-slate-100"></div>
-              <div className="text-center">
-                <p className="text-2xl font-black text-orange-400">{intlCount}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">国际</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm">
+               <div className="px-4 py-2 text-center border-r border-slate-100">
+                  <div className="text-xl font-black text-indigo-600">{stats.cn}</div>
+                  <div className="text-[9px] font-bold text-slate-400 uppercase">中国</div>
+               </div>
+               <div className="px-4 py-2 text-center">
+                  <div className="text-xl font-black text-amber-500">{stats.intl}</div>
+                  <div className="text-[9px] font-bold text-slate-400 uppercase">国际</div>
+               </div>
             </div>
-            
             <button 
               onClick={() => setIsScanning(!isScanning)}
-              className={`${isScanning ? 'bg-rose-500 shadow-rose-100' : 'bg-[#5551ff] shadow-indigo-100'} text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all flex items-center gap-2 active:scale-95`}
+              className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold transition-all active:scale-95 shadow-lg ${
+                isScanning ? 'bg-rose-500 text-white shadow-rose-100' : 'bg-indigo-600 text-white shadow-indigo-100'
+              }`}
             >
-              {isScanning ? <Loader2 className="w-5 h-5 animate-spin" /> : <Activity className="w-5 h-5" />}
-              {isScanning ? "停止捕获" : "开启自动捕获"}
+              {isScanning ? <Loader2 size={18} className="animate-spin" /> : <Activity size={18} />}
+              {isScanning ? "停止监控" : "开启监控"}
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* 动态扫描进度条 (新加的，增加视觉动感) */}
+        {/* 扫描进度条 */}
         {isScanning && (
-          <div className="w-full h-1 bg-slate-200 rounded-full mb-8 overflow-hidden">
+          <div className="w-full h-1.5 bg-slate-200 rounded-full mb-8 overflow-hidden">
             <div 
-              className="h-full bg-indigo-500 transition-all duration-100 ease-linear"
-              style={{ width: `${scanProgress}%` }}
+              className="h-full bg-indigo-500 transition-all duration-150 ease-linear shadow-[0_0_8px_rgba(99,102,241,0.6)]"
+              style={{ width: `${progress}%` }}
             ></div>
           </div>
         )}
 
-        {/* 搜索栏 - 保持原样 */}
-        <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row gap-2">
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
+        {/* 交互工具栏 */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex-1 bg-white flex items-center px-4 py-3 rounded-2xl border border-slate-200 shadow-sm">
+            <Search className="text-slate-300 mr-3" size={20} />
             <input 
-              type="text"
-              placeholder="搜索公司、技术需求或关键词..."
-              className="w-full pl-12 pr-4 py-3 bg-transparent outline-none text-sm font-medium"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              type="text" 
+              placeholder="搜索企业名称、关键词或技术细节..."
+              className="bg-transparent border-none outline-none w-full text-sm font-medium"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setFilterRegion(filterRegion === "中国" ? "all" : "中国")}
-              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${filterRegion === "中国" ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
-            >
-              仅看中国
-            </button>
-            <button 
-              onClick={() => setFilterRegion("all")}
-              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${filterRegion === "all" ? 'bg-[#1e293b] text-white' : 'text-slate-500 hover:bg-slate-50'}`}
-            >
-              显示全部
-            </button>
+          <div className="flex gap-2 p-1 bg-slate-200/50 rounded-2xl">
+            {["all", "中国", "国际"].map(type => (
+              <button 
+                key={type}
+                onClick={() => setFilter(type)}
+                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
+                  filter === type ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {type === 'all' ? '全部' : type}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* 数据列表 - 保持原样 */}
-        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#1e293b] text-white">
-                <th className="p-5 text-xs font-bold uppercase tracking-wider pl-8">单位名称</th>
-                <th className="p-5 text-xs font-bold uppercase tracking-wider text-center">区域</th>
-                <th className="p-5 text-xs font-bold uppercase tracking-wider">监控理由 / 行业背景</th>
-                <th className="p-5 text-xs font-bold uppercase tracking-wider">官网</th>
-                <th className="p-5 text-xs font-bold uppercase tracking-wider pr-8">联系方式</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              <tr>
-                <td colSpan="5" className="px-6 py-3 bg-slate-50/50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1 h-4 bg-[#5551ff] rounded-full"></div>
-                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                        实时捕获流 ({isScanning ? '正在不间断更新...' : '采集已静止'})
-                      </span>
-                    </div>
-                    {isScanning && <span className="text-[10px] text-indigo-400 font-bold animate-pulse">正在穿透防火墙检索中...</span>}
-                  </div>
-                </td>
-              </tr>
-              {filteredData.map((item) => (
-                <tr key={item.id} className={`group transition-all ${item.isNew ? 'bg-indigo-50/40 animate-in fade-in slide-in-from-top-2 duration-1000' : 'hover:bg-slate-50/50'}`}>
-                  <td className="p-5 pl-8">
-                    <div className="font-bold text-slate-700 text-[15px] group-hover:text-[#5551ff] transition-colors flex items-center gap-2">
-                      {item.name}
-                      {item.isNew && (
-                        <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded uppercase tracking-tighter animate-bounce">
-                          NEW
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[10px] font-black text-blue-500 mt-0.5 tracking-tighter uppercase">
-                      {item.sub}
-                    </div>
-                  </td>
-                  <td className="p-5 text-center">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold border ${
-                      item.region === '中国' 
-                        ? 'bg-blue-50 text-blue-500 border-blue-100' 
-                        : 'bg-green-50 text-green-600 border-green-100'
-                    }`}>
-                      {item.region}
-                    </span>
-                  </td>
-                  <td className="p-5">
-                    <p className="text-[13px] text-slate-500 leading-relaxed max-w-md font-medium">
-                      {item.reason}
-                    </p>
-                  </td>
-                  <td className="p-5">
-                    <a href={`http://${item.web}`} target="_blank" className="text-blue-500 hover:underline text-[13px] font-medium flex items-center gap-1">
-                      {item.web} <ExternalLink size={10} />
-                    </a>
-                  </td>
-                  <td className="p-5 pr-8">
-                    <span className="text-slate-600 font-mono text-[13px] tracking-tight">
-                      {item.phone}
-                    </span>
-                  </td>
+        {/* 核心数据看板 */}
+        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-slate-900 text-white">
+                  <th className="p-5 text-[11px] font-black uppercase tracking-widest pl-8">监控实体</th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-widest text-center">状态区划</th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-widest">捕获逻辑与需求详情</th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-widest">交互通道</th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-widest pr-8">更新时间</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          
-          {filteredData.length === 0 && (
-            <div className="p-20 text-center">
-              <p className="text-slate-400 font-medium italic">正在初始化系统，请稍候...</p>
-            </div>
-          )}
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {displayLeads.length > 0 ? displayLeads.map((item, idx) => (
+                  <tr key={item.id} className="group hover:bg-slate-50 transition-colors">
+                    <td className="p-5 pl-8">
+                      <div className="font-bold text-slate-900 text-base flex items-center gap-2 italic">
+                        <Cpu size={14} className="text-indigo-400" />
+                        {item.name}
+                      </div>
+                      <div className="text-[9px] font-black text-indigo-500 mt-1 uppercase flex items-center gap-1">
+                        <Zap size={10} fill="currentColor" /> {item.sub}
+                      </div>
+                    </td>
+                    <td className="p-5 text-center">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-tighter border ${
+                        item.region === '中国' 
+                          ? 'bg-blue-50 text-blue-600 border-blue-100' 
+                          : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                      }`}>
+                        {item.region}
+                      </span>
+                    </td>
+                    <td className="p-5">
+                      <p className="text-sm text-slate-500 leading-relaxed max-w-sm font-medium">
+                        {item.reason}
+                      </p>
+                    </td>
+                    <td className="p-5">
+                      <div className="space-y-1">
+                        <a href="#" className="text-blue-600 text-[12px] font-bold flex items-center gap-1 hover:underline">
+                          <ExternalLink size={12} /> {item.web}
+                        </a>
+                        <div className="text-slate-400 text-[11px] flex items-center gap-1">
+                          <Phone size={11} /> {item.phone}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-5 pr-8">
+                      <span className="text-[11px] font-mono font-bold text-slate-300">
+                        {item.timestamp}
+                      </span>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="5" className="p-20 text-center">
+                      <div className="flex flex-col items-center gap-2 opacity-20">
+                        <Activity size={48} />
+                        <p className="text-lg font-bold">正在接入全球半导体资讯流...</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* 底部标注 */}
-        <div className="mt-6 flex justify-between items-center px-4">
-          <div className="text-[11px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
-            <ShieldCheck size={14} className="text-emerald-500" /> 
-            底层数据库已同步 - 支持掉电记忆
+        {/* 底部页脚 */}
+        <footer className="mt-8 flex justify-between items-center px-4">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <ShieldCheck size={14} className="text-emerald-500" />
+              端到端气密性检测
+            </div>
           </div>
-          <div className="text-[11px] text-slate-300 font-medium">
-            Version 5.0 Alpha Build 2026.01.26
+          <div className="text-[10px] font-black text-slate-300 tracking-tighter italic">
+            SEAL-MONITOR PRO v6.2 // SYSTEM STABLE
           </div>
-        </div>
+        </footer>
+
       </div>
     </div>
   );
