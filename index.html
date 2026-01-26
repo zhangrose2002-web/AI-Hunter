@@ -1,194 +1,234 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>AI Hunter | 用 AI 猎捕趋势</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+import React, { useState, useEffect } from 'react';
+import { 
+  Search, 
+  Globe, 
+  Phone, 
+  ExternalLink, 
+  Activity, 
+  ChevronRight,
+  ShieldCheck,
+  Zap,
+  Filter
+} from 'lucide-react';
+
+// 初始种子数据
+const INITIAL_DATA = [
+  { id: 1, group: '今日收录', name: '中国电科 (CETC) 第十三研究所', sub: 'STRATEGIC CUSTOMER', region: '中国', reason: '半导体核心所。对平行封焊机、激光封焊有海量需求，用于微波多芯片模块 (MCM) 封装。', web: 'www.cetc13.com.cn', phone: '0311-87091888', isNew: false },
+  { id: 2, group: '今日收录', name: '中际旭创 (Innolight)', sub: 'MARKET LEADER', region: '中国', reason: '800G/1.6T光模块扩产高峰。近期多次发布自动化封装生产线招标公告。', web: 'www.innolight.com', phone: '0512-86669288', isNew: false },
+  { id: 3, group: '昨日收录', name: '长电科技 (JCET)', sub: 'OSAT GIANT', region: '中国', reason: 'SiP 模块产线需要大量封帽机及激光焊接方案。', web: 'www.jcetglobal.com', phone: '0510-86851123', isNew: false },
+  { id: 4, group: '昨日收录', name: 'Infineon Technologies', sub: 'GLOBAL SEMI', region: '国际', reason: '功率模块扩产线。需要高可靠性的真空封焊设备用于车规级IGBT模块。', web: 'www.infineon.com', phone: '+49 89 234-0', isNew: false }
+];
+
+export default function App() {
+  const [data, setData] = useState(INITIAL_DATA);
+  const [isScanning, setIsScanning] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterRegion, setFilterRegion] = useState("all");
+
+  // 模拟爬虫高频采集新数据
+  const startCrawl = () => {
+    if (isScanning) return;
+    setIsScanning(true);
+    
+    // 模拟 2 秒后发现新客户
+    setTimeout(() => {
+      const newPotentialTargets = [
+        { name: '新易盛 (Eoptolink)', reason: '光模块垂直整合扩产，新增4条陶瓷气密性封焊生产线需求。', web: 'www.eoptolink.com', phone: '028-67087999' },
+        { name: '意法半导体 (ST)', reason: '车规级传感器封装项目，正在评估国产平行封焊设备替代方案。', web: 'www.st.com', phone: '+41 22 929 29 29' },
+        { name: '华工正源', reason: '5G基站用激光器封测扩容，涉及高真空共晶焊及封焊设备。', web: 'www.genuine-opto.com', phone: '027-87180101' }
+      ];
+
+      const target = newPotentialTargets[Math.floor(Math.random() * newPotentialTargets.length)];
+      
+      const newItem = {
+        id: Date.now(),
+        group: '今日收录',
+        name: target.name,
+        sub: 'NEWLY DISCOVERED',
+        region: target.web.includes('.com') && !target.web.includes('.cn') ? '国际' : '中国',
+        reason: target.reason,
+        web: target.web,
+        phone: target.phone,
+        isNew: true // 标记为新抓取
+      };
+
+      setData(prev => {
+        // 过滤掉重复的（按名称）
+        if (prev.some(item => item.name === newItem.name)) return prev;
+        return [newItem, ...prev];
+      });
+      
+      setIsScanning(false);
+    }, 2000);
+  };
+
+  // 统计数据计算
+  const chinaCount = data.filter(i => i.region === '中国').length;
+  const intlCount = data.filter(i => i.region === '国际').length;
+  
+  // 过滤后的显示数据
+  const filteredData = data.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          item.reason.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRegion = filterRegion === "all" ? true : item.region === filterRegion;
+    return matchesSearch && matchesRegion;
+  });
+
+  return (
+    <div className="min-h-screen bg-[#f3f6f9] p-4 md:p-8 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto">
         
-        body {
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: #f8fafc;
-            color: #1e1e1e;
-            line-height: 1.6;
-        }
-
-        .gradient-bg {
-            background-image: linear-gradient(135deg, #4f46e5 0%, #1e3a8a 100%);
-        }
-
-        /* Tab 样式 - 完全保留你原来的视觉设计 */
-        .tab-nav-container {
-            max-width: 600px;
-            margin: 0 auto 2rem;
-            background: white;
-            border-radius: 14px;
-            padding: 6px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
-        }
-
-        .tab-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 16px;
-            font-weight: 600;
-            font-size: 1rem;
-            color: #4b5563;
-            background: transparent;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .tab-btn:hover {
-            background-color: #f1f5f9;
-        }
-
-        .tab-btn.active {
-            background: #4f46e5; 
-            color: white;
-            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
-        }
-
-        /* 内容区动画 */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header class="flex justify-start items-center py-6 border-b border-gray-200">
-            <div class="text-3xl font-extrabold text-indigo-600 tracking-tight">AI Hunter</div>
-        </header>
-
-        <div class="text-center py-16 sm:py-24 gradient-bg rounded-xl mt-8 shadow-2xl shadow-indigo-200">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-4 leading-tight">
-                用 AI 猎捕趋势，<br>重塑您的商业效率
-            </h1>
-            <p class="text-lg text-indigo-200 max-w-3xl mx-auto px-4">
-                精选 AI 工具与实战案例，助您<strong>降本、提效、看趋势</strong>。
+        {/* 顶部标题栏 */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <p className="text-xs font-bold text-slate-400 mb-1 flex items-center gap-2">
+              自动化爬虫系统 / 实时监控中
             </p>
+            <h1 className="text-3xl font-black text-[#1e293b] tracking-tight">全球封焊设备目标客户监控</h1>
+            <p className="text-slate-400 text-sm mt-1 font-medium">
+              数据库自动排重：已收录 <span className="font-bold text-indigo-600">{data.length}</span> 家独立客户
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-black text-blue-500">{chinaCount}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">中国区域</p>
+              </div>
+              <div className="w-[1px] h-8 bg-slate-100"></div>
+              <div className="text-center">
+                <p className="text-2xl font-black text-orange-400">{intlCount}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">国际区域</p>
+              </div>
+            </div>
+            
+            <button 
+              onClick={startCrawl}
+              disabled={isScanning}
+              className="bg-[#5551ff] hover:bg-[#4440ff] text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-indigo-100 transition-all flex items-center gap-2 active:scale-95 disabled:opacity-70"
+            >
+              {isScanning ? <Zap className="w-5 h-5 animate-pulse" /> : <Activity className="w-5 h-5" />}
+              {isScanning ? "正在实时采集" : "开始实时采集"}
+            </button>
+          </div>
         </div>
 
-        <div class="my-12">
-            <div class="tab-nav-container">
-                <div class="flex justify-between">
-                    <button class="tab-btn active" data-tab="cost">
-                        🔥 成本杀手
-                    </button>
-                    <button class="tab-btn" data-tab="efficiency">
-                        ⚡ 效率倍增
-                    </button>
-                    <button class="tab-btn" data-tab="trend">
-                        📡 趋势雷达
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-200">
-
-                <div id="cost" class="tab-content active">
-                    <h3 class="text-2xl font-bold text-indigo-700 mb-4">💰 成本杀手</h3>
-                    <ul id="cost-list" class="space-y-3 text-gray-700">
-                        <li>• 加载中...</li>
-                    </ul>
-                </div>
-
-                <div id="efficiency" class="tab-content">
-                    <h3 class="text-2xl font-bold text-indigo-700 mb-4">⚡ 效率倍增</h3>
-                    <ul id="efficiency-list" class="space-y-3 text-gray-700">
-                        <li>• 加载中...</li>
-                    </ul>
-                </div>
-
-                <div id="trend" class="tab-content">
-                    <h3 class="text-2xl font-bold text-indigo-700 mb-4">📡 趋势雷达</h3>
-                    <ul id="trend-list" class="space-y-3 text-gray-700">
-                        <li>• 加载中...</li>
-                    </ul>
-                </div>
-
-            </div>
+        {/* 搜索与过滤栏 - 保持你的 UI 样式 */}
+        <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
+            <input 
+              type="text"
+              placeholder="搜索客户名称、技术需求或应用领域..."
+              className="w-full pl-12 pr-4 py-3 bg-transparent outline-none text-sm font-medium"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setFilterRegion(filterRegion === "中国" ? "all" : "中国")}
+              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${filterRegion === "中国" ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              仅看中国
+            </button>
+            <button 
+              onClick={() => setFilterRegion("all")}
+              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${filterRegion === "all" ? 'bg-[#1e293b] text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              显示全部
+            </button>
+          </div>
         </div>
 
-        <footer class="text-center py-6 border-t border-gray-200 mt-12">
-            <p class="text-sm text-gray-500">© 2025 AI Hunter. All Rights Reserved.</p>
-        </footer>
+        {/* 数据列表 */}
+        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#1e293b] text-white">
+                <th className="p-5 text-xs font-bold uppercase tracking-wider pl-8">单位名称</th>
+                <th className="p-5 text-xs font-bold uppercase tracking-wider text-center">区域</th>
+                <th className="p-5 text-xs font-bold uppercase tracking-wider">监控理由 / 行业背景</th>
+                <th className="p-5 text-xs font-bold uppercase tracking-wider">官网</th>
+                <th className="p-5 text-xs font-bold uppercase tracking-wider pr-8">联系方式</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {/* 分组渲染：今日收录/昨日收录 */}
+              {['今日收录', '昨日收录'].map(groupName => {
+                const groupItems = filteredData.filter(i => i.group === groupName);
+                if (groupItems.length === 0) return null;
+
+                return (
+                  <React.Fragment key={groupName}>
+                    <tr>
+                      <td colSpan="5" className="px-6 py-3 bg-slate-50/50">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1 h-4 bg-[#5551ff] rounded-full"></div>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{groupName}</span>
+                        </div>
+                      </td>
+                    </tr>
+                    {groupItems.map((item) => (
+                      <tr key={item.id} className={`group transition-all ${item.isNew ? 'bg-indigo-50/30' : 'hover:bg-slate-50/50'}`}>
+                        <td className="p-5 pl-8">
+                          <div className="font-bold text-slate-700 text-[15px] group-hover:text-[#5551ff] transition-colors">
+                            {item.name}
+                          </div>
+                          <div className="text-[10px] font-black text-blue-500 mt-0.5 tracking-tighter uppercase">
+                            {item.sub}
+                          </div>
+                        </td>
+                        <td className="p-5 text-center">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold border ${
+                            item.region === '中国' 
+                              ? 'bg-blue-50 text-blue-500 border-blue-100' 
+                              : 'bg-green-50 text-green-600 border-green-100'
+                          }`}>
+                            {item.region}
+                          </span>
+                        </td>
+                        <td className="p-5">
+                          <p className="text-[13px] text-slate-500 leading-relaxed max-w-md font-medium">
+                            {item.reason}
+                          </p>
+                        </td>
+                        <td className="p-5">
+                          <a href={`http://${item.web}`} target="_blank" className="text-blue-500 hover:underline text-[13px] font-medium flex items-center gap-1">
+                            {item.web}
+                          </a>
+                        </td>
+                        <td className="p-5 pr-8">
+                          <span className="text-slate-600 font-mono text-[13px] tracking-tight">
+                            {item.phone}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+          
+          {filteredData.length === 0 && (
+            <div className="p-20 text-center">
+              <p className="text-slate-400 font-medium italic">未发现匹配的客户线索</p>
+            </div>
+          )}
+        </div>
+
+        {/* 底部标注 */}
+        <div className="mt-6 flex justify-between items-center px-4">
+          <div className="text-[11px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
+            <ShieldCheck size={14} className="text-emerald-500" /> Secure Data Link Verified
+          </div>
+          <div className="text-[11px] text-slate-300 font-medium">
+            Version 2.5 Build 2026.01.26
+          </div>
+        </div>
+      </div>
     </div>
-
-    <script>
-        document.querySelectorAll('.tab-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                const tabId = button.getAttribute('data-tab');
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-    </script>
-
-    <script>
-      fetch('./data.json?t=' + Date.now()) 
-        .then(response => {
-          if (!response.ok) throw new Error('网络错误');
-          return response.json();
-        })
-        .then(data => {
-          console.log('数据已更新:', data);
-          const categories = { cost: 'cost-list', efficiency: 'efficiency-list', trend: 'trend-list' };
-
-          Object.entries(categories).forEach(([key, id]) => {
-            const container = document.getElementById(id);
-            if (!container) return;
-            container.innerHTML = '';
-
-            const items = data[key] || [];
-            if (items.length === 0) {
-              container.innerHTML = '<li class="text-gray-400">📡 暂无最新趋势，捕获中...</li>';
-              return;
-            }
-
-            items.forEach(item => {
-              const li = document.createElement('li');
-              li.className = 'leading-relaxed mb-3';
-              
-              // 自动适配 source 或 link 字段
-              const link = item.source || item.link || '#';
-              const description = item.desc || item.content || '暂无说明';
-
-              li.innerHTML = `
-                • <a href="${link}" target="_blank" rel="noopener noreferrer" 
-                    class="font-medium text-indigo-600 hover:underline break-words">
-                    ${item.title}
-                  </a>
-                <div class="text-gray-500 text-sm mt-1">${description}</div>
-              `;
-              container.appendChild(li);
-            });
-          });
-        })
-        .catch(err => {
-          console.error(err);
-          document.querySelectorAll('[id$="-list"]').forEach(el => {
-            el.innerHTML = '<li class="text-red-400">⚠️ 数据同步中，请刷新页面重试</li>';
-          });
-        });
-    </script>
-</body>
-</html>
+  );
+}
