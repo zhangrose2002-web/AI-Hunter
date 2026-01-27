@@ -1,38 +1,94 @@
+import requests
+import re
 import json
+import time
+import hashlib
+from datetime import datetime
 
-def run_real_crawler():
-    print("正在提取行业深度线索...")
-    
-    # 模拟真实爬取的完整数据
-    # 在实际爬虫中，这些数据将通过 BeautifulSoup 或 Selenium 从目标网页抓取
-    scraped_data = [
-        {
-            "org_name": "长电科技（绍兴）有限公司",
-            "region": "浙江·绍兴",
-            "reason_field": "推荐理由：国家集成电路产业基金增持。应用领域：高端 FC-BGA 封装线扩产，急需固晶机与焊线机设备。",
-            "website": "http://www.jcetglobal.com",
-            "phone": "0575-88886666"  # 爬虫直接抓取的完整号码
-        },
-        {
-            "org_name": "通富微电总部",
-            "region": "江苏·南通",
-            "reason_field": "推荐理由：AMD 核心封测伙伴。应用领域：7nm/5nm 先进封装扩产，正进行大规模设备招标。",
-            "website": "http://www.tfme.com",
-            "phone": "0513-85055555"
-        },
-        {
-            "org_name": "华天科技（昆山）",
-            "region": "江苏·昆山",
-            "reason_field": "推荐理由：TSV 封装技术领先。应用领域：CIS 图像传感器封装，产线技术升级改造中。",
-            "website": "http://www.ht-tech.com",
-            "phone": "0512-57351111"
+class AIHunterMonitor:
+    def __init__(self, target_url):
+        self.target_url = target_url
+        self.last_data_hash = None
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         }
-    ]
-    
-    with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(scraped_data, f, ensure_ascii=False, indent=4)
-    
-    print(f"数据抓取成功！已保存 {len(scraped_data)} 条完整线索至 data.json")
+
+    def get_data_hash(self, data_str):
+        """计算数据的哈希值，用于比对内容是否变化"""
+        return hashlib.md5(data_str.encode('utf-8')).hexdigest()
+
+    def fetch_leads(self):
+        try:
+            # 1. 获取网页源码
+            response = requests.get(self.target_url, headers=self.headers, timeout=10)
+            response.raise_for_status()
+            html = response.text
+
+            # 2. 使用正则表达式提取 JS 中的 leadsData 数组
+            # 匹配 const leadsData = [ ... ]; 结构
+            pattern = re.compile(r'const leadsData = (\[.*?\]);', re.DOTALL)
+            match = pattern.search(html)
+
+            if not match:
+                print(f"[{datetime.now()}] 错误: 未能在页面中找到 leadsData 数据结构")
+                return None
+
+            json_str = match.group(1)
+            
+            # 3. 检查数据是否更新
+            current_hash = self.get_data_hash(json_str)
+            if current_hash == self.last_data_hash:
+                print(f"[{datetime.now()}] 状态: 扫描完毕，数据无变化")
+                return None
+
+            self.last_data_hash = current_hash
+            
+            # 4. 解析 JSON 数据
+            leads = json.loads(json_str)
+            return leads
+
+        except Exception as e:
+            print(f"[{datetime.now()}] 抓取异常: {e}")
+            return None
+
+    def process_leads(self, leads):
+        """处理抓取到的新数据"""
+        print(f"\n{'='*20} 发现数据更新！ {'='*20}")
+        for lead in leads:
+            print(f"ID: {lead['id']}")
+            print(f"公司: {lead['company']}")
+            print(f"标签: {lead['tag']}")
+            print(f"地区: {lead['location']}")
+            print(f"理由: {lead['reason']}")
+            print(f"网站: {lead['website']}")
+            print(f"电话: {lead['phone']}")
+            print("-" * 50)
+        print(f"{'='*55}\n")
+
+    def start_monitoring(self, interval=60):
+        """
+        开始不间断监控
+        :param interval: 抓取间隔时间（秒），默认60秒
+        """
+        print(f"AI 猎人 INSIGHT 监控启动...")
+        print(f"目标地址: {self.target_url}")
+        print(f"抓取频率: 每 {interval} 秒/次")
+        print("-" * 50)
+
+        while True:
+            leads = self.fetch_leads()
+            if leads:
+                self.process_leads(leads)
+            
+            # 等待下一次抓取
+            time.sleep(interval)
 
 if __name__ == "__main__":
-    run_real_crawler()
+    # 将此处的 URL 替换为你网页的实际访问地址
+    # 如果是本地文件，需要搭建一个简单的本地服务器（如 python -m http.server）
+    TARGET_URL = "http://localhost:8000/index.html" 
+    
+    monitor = AIHunterMonitor(TARGET_URL)
+    
+    # 开始监控，建议设置合理的间隔（如 60 秒），避免给服务器造成负担
+    monitor.start_monitoring(interval=30)
