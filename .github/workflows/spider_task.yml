@@ -1,0 +1,37 @@
+name: AI Hunter Engine Sync
+
+on:
+  # 允许手动从控制台触发
+  repository_dispatch:
+    types: [run-spider]
+  # 允许定时自动运行（例如每天凌晨 2 点）
+  schedule:
+    - cron: '0 18 * * *' 
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run Spider Engine
+        run: python spider.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "AI-Hunter-Bot"
+          git config --global user.email "bot@insight.ai"
+          git add index.html
+          git commit -m "Update Leads Data: $(date)" || exit 0
+          git push
