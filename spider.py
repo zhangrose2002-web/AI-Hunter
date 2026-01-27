@@ -1,14 +1,15 @@
 import os
 import re
 import json
-import requests
+import ftplib
 from datetime import datetime
 
-# 模拟抓取逻辑（实际可对接具体 API 或 BeautifulSoup 爬取）
+# ==========================================
+# 1. 模拟抓取逻辑
+# ==========================================
 def fetch_industry_leads():
     print("开始执行全网线索搜寻...")
-    # 这里定义你的关键词矩阵逻辑
-    # 示例数据：实际开发中这里是爬虫抓取回来的结果
+    # 这里是你的关键词抓取结果汇总
     new_leads = [
         {
             "id": int(datetime.now().timestamp()),
@@ -16,8 +17,8 @@ def fetch_industry_leads():
             "location": "广东·深圳",
             "category": "domestic",
             "reason": "新增 [SiC功率器件] 封装产线招标，急需 [真空平行缝焊机] 及气密性检测设备。",
-            "website": "example.com",
-            "phone": "见招标公告",
+            "website": "cs.bj77.cn",
+            "phone": "见官网公告",
             "tag": "新增产线"
         },
         {
@@ -33,24 +34,75 @@ def fetch_industry_leads():
     ]
     return new_leads
 
+# ==========================================
+# 2. 更新本地 index.html
+# ==========================================
 def update_index_html(new_data):
     file_path = 'index.html'
+    if not os.path.exists(file_path):
+        print(f"❌ 错误: 找不到 {file_path} 文件")
+        return
+
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # 找到 leadsData 数组并替换
-    # 使用正则匹配 /* DATA_START */ 和 /* DATA_END */ 之间的内容
+    # 匹配首页中的数据标记区
     pattern = r'/\* DATA_START \*/(.*?)/\* DATA_END \*/'
-    
-    # 将新数据转为格式化的 JS 数组
     js_data_str = f"\n    const leadsData = {json.dumps(new_data, ensure_ascii=False, indent=6)};\n    "
     
     new_content = re.sub(pattern, f"/* DATA_START */{js_data_str}/* DATA_END */", content, flags=re.DOTALL)
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(new_content)
-    print("首页数据已完成热更新。")
+    print("✅ 首页数据本地更新完成。")
 
+# ==========================================
+# 3. 传回阿里云虚拟空间 (核心处理)
+# ==========================================
+def upload_to_server():
+    # 直接填入你的阿里云 FTP 信息
+    FTP_SERVER = "qxu1590320302.my3w.com"
+    FTP_USER = "qxu1590320302"
+    FTP_PASS = "123456ab"
+
+    try:
+        print(f"正在连接 FTP: {FTP_SERVER} ...")
+        session = ftplib.FTP()
+        session.connect(FTP_SERVER, 21, timeout=30)
+        session.login(FTP_USER, FTP_PASS)
+        
+        # 阿里云主机必须开启被动模式
+        session.set_pasv(True)
+        
+        # 阿里云主机的网页根目录必须是 /htdocs
+        session.cwd('/htdocs')
+        
+        # 定义需要同步的文件
+        files_to_send = ['index.html', 'spider.html', 'live.html']
+        
+        for file_name in files_to_send:
+            if os.path.exists(file_name):
+                with open(file_name, 'rb') as f:
+                    session.storbinary(f'STOR {file_name}', f)
+                    print(f"🚀 已成功同步到空间: {file_name}")
+            else:
+                print(f"⚠️ 跳过: 本地未找到 {file_name}")
+
+        session.quit()
+        print(f"✨ 实时同步完成！访问地址: http://cs.bj77.cn/")
+        
+    except Exception as e:
+        print(f"❌ 传输失败: {e}")
+
+# ==========================================
+# 4. 统一执行入口
+# ==========================================
 if __name__ == "__main__":
+    # 第一步：模拟或实际爬取数据
     leads = fetch_industry_leads()
+    
+    # 第二步：将数据写入本地 HTML 模板
     update_index_html(leads)
+    
+    # 第三步：将更新后的 HTML 推送到阿里云空间
+    upload_to_server()
