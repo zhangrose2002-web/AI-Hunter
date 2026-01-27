@@ -2,152 +2,89 @@ import requests
 import re
 import json
 import time
-import hashlib
 from datetime import datetime
 
-class SalesHunterMonitor:
-    def __init__(self, target_url):
-        self.target_url = target_url
-        self.last_data_hash = None
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-        
-        # 核心销售关键词库
-        self.market_intelligence = {
-            # 1. 核心设备关联词 (直接关联产品)
-            "device_links": {
-                "平行缝焊机": ["金属管壳", "气密性", "真空封装", "SMD封装", "厚膜电路", "微波组件", "系统级封装", "SiP"],
-                "激光封焊机": ["激光封焊", "激光焊接", "激光雷达", "光电探测器", "二极管封装", "OBC封装"],
-                "封帽机/储能焊": ["TO-CAN", "TOSA", "ROSA", "晶振", "石英晶体", "石英振荡器"]
-            },
-            
-            # 2. 行业高热度领域 (寻找潜在线索)
-            "hot_sectors": [
-                "800G光模块", "EML激光器", "高速光收发", "CPO技术", 
-                "车规级认证", "IGBT模块", "SiC功率器件", "MEMS传感器", "红外探测器"
-            ],
-            
-            # 3. 销售触发动作 (判断是否有钱买设备)
-            "trigger_actions": ["产线扩能", "新增产线招标", "产能翻倍", "扩建厂房", "小批量试产", "工艺研发", "打样", "国产化替代", "自主可控"],
-            
-            # 4. 深度逻辑组合 (命中即为高优商机)
-            "priority_combos": [
-                (r"产能翻倍", r"TO-CAN封装"),
-                (r"产线扩能", r"IGBT模块封装"),
-                (r"增产", r"光收发组件\(TOSA\)"),
-                (r"自主可控", r"气密性封装设备"),
-                (r"国产替代", r"真空平行缝焊机"),
-                (r"核心装备", r"微波组件封装"),
-                (r"小批量试产", r"SiC功率模块"),
-                (r"工艺研发", r"MEMS真空封装"),
-                (r"打样", r"激光封焊工艺")
-            ]
+class IndustryLeadSpider:
+    def __init__(self, url):
+        self.url = url
+        self.headers = {'User-Agent': 'Mozilla/5.0 SalesHunter/1.0'}
+        # 定义销售关键词权重
+        self.sales_keywords = {
+            "parallel_seam": ["平行缝焊机", "金属管壳", "气密性", "真空封装", "微波组件", "厚膜电路"],
+            "cap_sealer": ["封帽机", "TO-CAN", "TOSA", "ROSA", "晶振", "储能焊"],
+            "laser_welder": ["激光封焊", "激光打样", "OBC封装", "激光雷达", "动力电池封装"]
         }
 
-    def get_data_hash(self, data_str):
-        return hashlib.md5(data_str.encode('utf-8')).hexdigest()
-
-    def analyze_sales_opportunity(self, lead):
-        """
-        销售商机分析引擎
-        """
-        # 聚合所有文本内容用于检索
-        content = f"{lead.get('company', '')} {lead.get('tag', '')} {lead.get('reason', '')} {lead.get('location', '')}".upper()
-        
-        matched_devices = []
-        scores = 0
-        match_details = []
-
-        # 检查设备关联
-        for device, keywords in self.market_intelligence["device_links"].items():
-            for kw in keywords:
-                if kw.upper() in content:
-                    matched_devices.append(device)
-                    match_details.append(f"设备相关: {kw}")
-                    scores += 10
-                    break
-
-        # 检查触发动作 (加分项)
-        for act in self.market_intelligence["trigger_actions"]:
-            if act.upper() in content:
-                match_details.append(f"触发动作: {act}")
-                scores += 20
-
-        # 检查高优组合 (核心得分点)
-        for p1, p2 in self.market_intelligence["priority_combos"]:
-            if re.search(p1.upper(), content) and re.search(p2.upper(), content):
-                match_details.append(f"高优商机组合: {p1} + {p2}")
-                scores += 50
-                lead['is_hot'] = True
-
-        # 检查热门领域
-        for sector in self.market_intelligence["hot_sectors"]:
-            if sector.upper() in content:
-                match_details.append(f"目标领域: {sector}")
-                scores += 15
-
-        return {
-            "is_opportunity": scores > 15,
-            "score": scores,
-            "matched_devices": list(set(matched_devices)),
-            "reasons": match_details
-        }
-
-    def fetch_data(self):
+    def fetch_and_parse(self):
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] 正在扫描目标网页线索...")
         try:
-            response = requests.get(self.target_url, headers=self.headers, timeout=10)
-            response.raise_for_status()
-            html = response.text
-            match = re.search(r'const leadsData = (\[.*?\]);', html, re.DOTALL)
-            if not match: return None
+            # 在实际运行中，如果是本地文件，可以使用 open().read()
+            # 这里演示从 URL 获取
+            response = requests.get(self.url, headers=self.headers, timeout=5)
+            html_content = response.text
             
-            json_str = match.group(1)
-            current_hash = self.get_data_hash(json_str)
-            if current_hash == self.last_data_hash: return None
-            
-            self.last_data_hash = current_hash
-            return json.loads(json_str)
+            # 使用正则提取网页内的 leadsData 数组
+            data_match = re.search(r'const leadsData = (\[.*?\]);', html_content, re.DOTALL)
+            if not data_match:
+                print("未找到 leadsData 数据源")
+                return []
+
+            raw_leads = json.loads(data_match.group(1))
+            return self.analyze_leads(raw_leads)
         except Exception as e:
-            print(f"数据获取失败: {e}")
-            return None
+            print(f"读取失败: {e}")
+            return []
 
-    def process_and_push(self, leads):
-        print(f"\n{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - 正在扫描新一批线索...")
-        
-        found_any = False
+    def analyze_leads(self, leads):
+        analyzed_results = []
         for lead in leads:
-            result = self.analyze_sales_opportunity(lead)
+            score = 0
+            reason = lead.get('reason', '')
             
-            if result["is_opportunity"]:
-                found_any = True
-                print(f"\n🔥 发现高价值销售商机！")
-                print(f"【公司】: {lead['company']}")
-                print(f"【推荐设备】: {' / '.join(result['matched_devices']) if result['matched_devices'] else '封装相关设备'}")
-                print(f"【信心指数】: {result['score']} 分")
-                print(f"【匹配详情】: {', '.join(result['reasons'])}")
-                print(f"【联络信息】: {lead['phone']} | {lead['website']}")
-                print("-" * 50)
-                
-                # 此处可扩展发送至网页端、企业微信、或数据库
-                # requests.post("http://your-backend.com/api/push", json={...})
+            # 1. 识别产品线关联
+            target_machines = []
+            for machine, keys in self.sales_keywords.items():
+                if any(k in reason for k in keys):
+                    target_machines.append(machine)
+                    score += 20
+            
+            # 2. 识别“扩产”或“招标”动作（高价值商机）
+            if any(k in reason for k in ["产线扩能", "新增产线", "招标", "投产", "翻倍", "小批量试产"]):
+                score += 50
+                lead['is_priority'] = True
+            
+            if score >= 20:
+                lead['analysis_score'] = score
+                lead['target_machines'] = target_machines
+                analyzed_results.append(lead)
+        
+        return analyzed_results
 
-        if not found_any:
-            print("本轮更新未发现匹配的销售线索。")
+    def push_to_ui_mock(self, lead):
+        """
+        模拟将爬取到的新商机推送到网页前端
+        """
+        print(f"!!! 发现高价值线索 !!!")
+        print(f"公司: {lead['company']}")
+        print(f"建议推销设备: {lead.get('target_machines')}")
+        print(f"联系电话: {lead['phone']}")
+        print("-" * 30)
 
-    def run(self, interval=30):
-        print("="*60)
-        print("AI 猎人 - 封装设备销售情报系统 启动")
-        print(f"当前监控: 封帽机 / 平行缝焊机 / 激光封焊机 场景")
-        print("="*60)
+    def run_forever(self):
+        print("AI 销售情报爬虫已启动，正在监控封测设备商机...")
         while True:
-            leads = self.fetch_data()
-            if leads:
-                self.process_and_push(leads)
-            time.sleep(interval)
+            leads = self.fetch_and_parse()
+            for lead in leads:
+                if lead.get('is_priority'):
+                    self.push_to_ui_mock(lead)
+            
+            time.sleep(60) # 每分钟扫描一次
 
 if __name__ == "__main__":
-    # 使用本地模拟地址，实际请替换为你的数据源 URL
-    TARGET_URL = "http://localhost:8000/index.html" 
-    monitor = SalesHunterMonitor(TARGET_URL)
-    monitor.run(interval=20)
+    # 实际使用时将 path 替换为 index.html 的访问路径
+    spider = IndustryLeadSpider("http://localhost:8000/index.html")
+    # spider.run_forever() # 启动循环
+    
+    # 单次运行演示
+    found = spider.fetch_and_parse()
+    print(f"本轮共发现 {len(found)} 条高度相关的封装设备商机。")
