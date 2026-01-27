@@ -1,290 +1,196 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { 
-  Search, 
-  Globe, 
-  Phone, 
-  ExternalLink, 
-  Activity, 
-  ShieldCheck,
-  Database,
-  Loader2,
-  Cpu,
-  Zap
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 猎人 - 封焊设备市场监测系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+SC:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #e2e8f0;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .loading-shimmer {
+            background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-/**
- * -------------------------------------------------------------------
- * 工业级数据模拟引擎 - 确保存续抓取
- * -------------------------------------------------------------------
- */
-const prefixList = ["中", "华", "精", "芯", "微", "捷", "奥", "盛", "瑞", "博", "科", "智", "泰", "森", "意", "星", "拓", "格"];
-const midList = ["际", "为", "工", "测", "达", "成", "信", "迅", "联", "创", "和", "众", "德", "丰", "源", "研", "技", "通"];
-const suffixList = ["半导体", "微电子", "光通信", "光电", "技术", "封装", "电子", "科技", "自动化", "研究院", "工业", "系统"];
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
 
-const generateUniqueCompany = () => {
-  const name = prefixList[Math.floor(Math.random() * prefixList.length)] + 
-               midList[Math.floor(Math.random() * midList.length)] + 
-               suffixList[Math.floor(Math.random() * suffixList.length)];
-  
-  const isDomestic = Math.random() > 0.4;
-  const region = isDomestic ? "中国" : "国际";
-  
-  const focusAreas = [
-    "扩建800G光模块封装线，急需高精度封焊设备。",
-    "车规级IGBT模块研发，需解决大功率散热焊接难题。",
-    "SiP先进封装试点，正对比评估平行封焊方案。",
-    "MEMS传感器气密性封装需求，要求真空环境作业。",
-    "由于订单暴增，计划引进3条自动化封焊流水线。",
-    "光刻胶配套封焊项目，涉及超净室环境操作。",
-    "新型激光雷达组装，寻找陶瓷基板封焊技术。"
-  ];
-  
-  return {
-    id: Date.now() + Math.random(),
-    name: name,
-    sub: "NEW DISCOVERY",
-    region: region,
-    reason: focusAreas[Math.floor(Math.random() * focusAreas.length)],
-    web: `www.${Math.random().toString(36).substring(7)}.com${isDomestic ? '.cn' : ''}`,
-    phone: isDomestic ? `0${Math.floor(10 + Math.random() * 80)}-${Math.floor(10000000 + Math.random() * 90000000)}` : `+${Math.floor(1 + Math.random() * 99)} ${Math.floor(100 + Math.random() * 900)}`,
-    timestamp: new Date().toLocaleTimeString()
-  };
-};
+        function App() {
+            const [rawData, setRawData] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [searchTerm, setSearchTerm] = useState("");
+            const [filterRegion, setFilterRegion] = useState("全部");
 
-export default function App() {
-  const [leads, setLeads] = useState([]);
-  const [isScanning, setIsScanning] = useState(true);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
-  const [progress, setProgress] = useState(0);
-  
-  const STORAGE_ID = 'SEAL_LEADS_SYSTEM_V6';
-  const leadsRef = useRef([]);
+            // 自动加载 GitHub 仓库中的 data.json
+            useEffect(() => {
+                const fetchData = async () => {
+                    try {
+                        // 添加随机参数防止缓存
+                        const response = await fetch(`data.json?t=${new Date().getTime()}`);
+                        if (!response.ok) throw new Error('数据文件加载失败');
+                        const data = await response.json();
+                        
+                        // 兼容两种格式：直接数组 或 带 metadata 的对象
+                        const list = Array.isArray(data) ? data : (data.customers || []);
+                        setRawData(list);
+                    } catch (err) {
+                        setError(err.message);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchData();
+            }, []);
 
-  // 1. 初始加载：从浏览器缓存中恢复已有的线索
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_ID);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setLeads(parsed);
-        leadsRef.current = parsed;
-      }
-    } catch (e) {
-      console.error("Storage error:", e);
-    }
-  }, []);
+            const filteredData = useMemo(() => {
+                return rawData.filter(item => {
+                    const searchStr = searchTerm.toLowerCase();
+                    // 适配爬虫脚本输出的字段名
+                    const name = (item.name || "").toLowerCase();
+                    const industry = (item.industry || "").toLowerCase();
+                    const reason = (item.reason || (item.analysis && item.analysis.reason) || "").toLowerCase();
+                    
+                    const matchesSearch = name.includes(searchStr) || industry.includes(searchStr) || reason.includes(searchStr);
+                    
+                    // 地区识别逻辑
+                    const loc = item.location || "";
+                    const province = typeof loc === 'object' ? loc.province : loc;
+                    const isChina = ["江苏", "广东", "湖北", "浙江", "安徽", "北京", "上海", "深圳", "无锡", "武汉"].some(p => province && province.includes(p));
+                    const regionCategory = isChina ? "中国" : "国际";
 
-  // 2. 核心自动化抓取逻辑
-  useEffect(() => {
-    let interval;
-    if (isScanning) {
-      interval = setInterval(() => {
-        // 模拟扫描进度
-        setProgress(prev => {
-          if (prev >= 100) {
-            // 当进度条跑满时，尝试添加新数据
-            const newLead = generateUniqueCompany();
-            
-            // 严格去重：如果名字已经存在，则不添加
-            const exists = leadsRef.current.some(l => l.name === newLead.name);
-            if (!exists) {
-              const updated = [newLead, ...leadsRef.current].slice(0, 50); // 最多保留50条最热线索
-              setLeads(updated);
-              leadsRef.current = updated;
-              localStorage.setItem(STORAGE_ID, JSON.stringify(updated));
-            }
-            return 0;
-          }
-          return prev + 5; // 每轮跳动
-        });
-      }, 150); // 采样频率
-    }
-    return () => clearInterval(interval);
-  }, [isScanning]);
+                    const matchesRegion = filterRegion === "全部" || regionCategory === filterRegion;
+                    return matchesSearch && matchesRegion;
+                });
+            }, [searchTerm, filterRegion, rawData]);
 
-  // 3. 计算过滤后的数据
-  const displayLeads = useMemo(() => {
-    return leads.filter(l => {
-      const matchText = l.name.includes(search) || l.reason.includes(search);
-      const matchRegion = filter === "all" || l.region === filter;
-      return matchText && matchRegion;
-    });
-  }, [leads, search, filter]);
+            return (
+                <div className="min-h-screen p-4 md:p-8 lg:px-12">
+                    <div className="max-w-7xl mx-auto">
+                        <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                            <div>
+                                <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                                    <span className="p-2 bg-indigo-600 rounded-lg text-xl">🎯</span>
+                                    AI 猎人 <span className="text-indigo-400">封焊市场监测</span>
+                                </h1>
+                                <p className="text-slate-500 mt-2 text-sm">自动追踪半导体、MEMS及功率器件封装扩产动向</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-[10px] font-mono text-slate-600 bg-slate-900 px-3 py-1 rounded-full border border-slate-800">
+                                    SYNC STATUS: {loading ? 'FETCHING...' : 'LIVE'}
+                                </span>
+                            </div>
+                        </header>
 
-  const stats = useMemo(() => ({
-    cn: leads.filter(l => l.region === "中国").length,
-    intl: leads.filter(l => l.region === "国际").length
-  }), [leads]);
-
-  return (
-    <div className="min-h-screen bg-[#f8fafc] p-6 font-sans antialiased text-slate-900">
-      <div className="max-w-6xl mx-auto">
-        
-        {/* 顶部状态条 */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="flex h-2 w-2 relative">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isScanning ? 'bg-indigo-400' : 'bg-slate-400'}`}></span>
-                <span className={`relative inline-flex rounded-full h-2 w-2 ${isScanning ? 'bg-indigo-500' : 'bg-slate-500'}`}></span>
-              </span>
-              <span className="text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">
-                {isScanning ? "Autonomous Scanning Active" : "Scanning Paused"}
-              </span>
-            </div>
-            <h1 className="text-4xl font-black tracking-tighter text-slate-900">
-              全球封焊设备目标客户监控 <span className="text-indigo-600">.</span>
-            </h1>
-            <p className="text-slate-500 mt-2 flex items-center gap-2 text-sm">
-              <Database size={14} /> 自动同步本地数据库：累计捕获 <span className="font-bold text-slate-900">{leads.length}</span> 条高价值线索
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm">
-               <div className="px-4 py-2 text-center border-r border-slate-100">
-                  <div className="text-xl font-black text-indigo-600">{stats.cn}</div>
-                  <div className="text-[9px] font-bold text-slate-400 uppercase">中国</div>
-               </div>
-               <div className="px-4 py-2 text-center">
-                  <div className="text-xl font-black text-amber-500">{stats.intl}</div>
-                  <div className="text-[9px] font-bold text-slate-400 uppercase">国际</div>
-               </div>
-            </div>
-            <button 
-              onClick={() => setIsScanning(!isScanning)}
-              className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold transition-all active:scale-95 shadow-lg ${
-                isScanning ? 'bg-rose-500 text-white shadow-rose-100' : 'bg-indigo-600 text-white shadow-indigo-100'
-              }`}
-            >
-              {isScanning ? <Loader2 size={18} className="animate-spin" /> : <Activity size={18} />}
-              {isScanning ? "停止监控" : "开启监控"}
-            </button>
-          </div>
-        </header>
-
-        {/* 扫描进度条 */}
-        {isScanning && (
-          <div className="w-full h-1.5 bg-slate-200 rounded-full mb-8 overflow-hidden">
-            <div 
-              className="h-full bg-indigo-500 transition-all duration-150 ease-linear shadow-[0_0_8px_rgba(99,102,241,0.6)]"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        )}
-
-        {/* 交互工具栏 */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1 bg-white flex items-center px-4 py-3 rounded-2xl border border-slate-200 shadow-sm">
-            <Search className="text-slate-300 mr-3" size={20} />
-            <input 
-              type="text" 
-              placeholder="搜索企业名称、关键词或技术细节..."
-              className="bg-transparent border-none outline-none w-full text-sm font-medium"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2 p-1 bg-slate-200/50 rounded-2xl">
-            {["all", "中国", "国际"].map(type => (
-              <button 
-                key={type}
-                onClick={() => setFilter(type)}
-                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                  filter === type ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                {type === 'all' ? '全部' : type}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 核心数据看板 */}
-        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-slate-900 text-white">
-                  <th className="p-5 text-[11px] font-black uppercase tracking-widest pl-8">监控实体</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-widest text-center">状态区划</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-widest">捕获逻辑与需求详情</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-widest">交互通道</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-widest pr-8">更新时间</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {displayLeads.length > 0 ? displayLeads.map((item, idx) => (
-                  <tr key={item.id} className="group hover:bg-slate-50 transition-colors">
-                    <td className="p-5 pl-8">
-                      <div className="font-bold text-slate-900 text-base flex items-center gap-2 italic">
-                        <Cpu size={14} className="text-indigo-400" />
-                        {item.name}
-                      </div>
-                      <div className="text-[9px] font-black text-indigo-500 mt-1 uppercase flex items-center gap-1">
-                        <Zap size={10} fill="currentColor" /> {item.sub}
-                      </div>
-                    </td>
-                    <td className="p-5 text-center">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-tighter border ${
-                        item.region === '中国' 
-                          ? 'bg-blue-50 text-blue-600 border-blue-100' 
-                          : 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                      }`}>
-                        {item.region}
-                      </span>
-                    </td>
-                    <td className="p-5">
-                      <p className="text-sm text-slate-500 leading-relaxed max-w-sm font-medium">
-                        {item.reason}
-                      </p>
-                    </td>
-                    <td className="p-5">
-                      <div className="space-y-1">
-                        <a href="#" className="text-blue-600 text-[12px] font-bold flex items-center gap-1 hover:underline">
-                          <ExternalLink size={12} /> {item.web}
-                        </a>
-                        <div className="text-slate-400 text-[11px] flex items-center gap-1">
-                          <Phone size={11} /> {item.phone}
+                        <div className="glass-panel rounded-2xl p-4 mb-6 flex flex-col md:flex-row gap-4 items-center">
+                            <div className="flex bg-slate-900 p-1 rounded-xl w-full md:w-auto border border-slate-800">
+                                {["全部", "中国", "国际"].map(r => (
+                                    <button 
+                                        key={r}
+                                        onClick={() => setFilterRegion(r)}
+                                        className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${filterRegion === r ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
+                                    >
+                                        {r}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="relative flex-1 w-full">
+                                <input 
+                                    type="text" 
+                                    placeholder="搜索企业、产线、需求关键词..."
+                                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-all"
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                />
+                            </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="p-5 pr-8">
-                      <span className="text-[11px] font-mono font-bold text-slate-300">
-                        {item.timestamp}
-                      </span>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr>
-                    <td colSpan="5" className="p-20 text-center">
-                      <div className="flex flex-col items-center gap-2 opacity-20">
-                        <Activity size={48} />
-                        <p className="text-lg font-bold">正在接入全球半导体资讯流...</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        {/* 底部页脚 */}
-        <footer className="mt-8 flex justify-between items-center px-4">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              <ShieldCheck size={14} className="text-emerald-500" />
-              端到端气密性检测
-            </div>
-          </div>
-          <div className="text-[10px] font-black text-slate-300 tracking-tighter italic">
-            SEAL-MONITOR PRO v6.2 // SYSTEM STABLE
-          </div>
-        </footer>
+                        <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl border-slate-800">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-900/80 text-slate-500 text-[11px] uppercase tracking-wider font-bold">
+                                    <tr>
+                                        <th className="px-6 py-4">潜在客户</th>
+                                        <th className="px-6 py-4">核心行业</th>
+                                        <th className="px-6 py-4">扩产/需求情报</th>
+                                        <th className="px-6 py-4 text-right">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800">
+                                    {loading ? (
+                                        [...Array(5)].map((_, i) => (
+                                            <tr key={i}><td colSpan="4" className="px-6 py-8 loading-shimmer"></td></tr>
+                                        ))
+                                    ) : filteredData.length > 0 ? filteredData.map((item, idx) => (
+                                        <tr key={idx} className="hover:bg-indigo-900/10 transition-colors group">
+                                            <td className="px-6 py-6">
+                                                <div className="font-bold text-white text-base">{item.name}</div>
+                                                <div className="text-xs text-indigo-400 mt-1 flex items-center gap-1">
+                                                    📍 {typeof item.location === 'object' ? `${item.location.province}·${item.location.city}` : item.location}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-6">
+                                                <span className="bg-slate-800 text-slate-300 text-[10px] px-2 py-1 rounded font-bold border border-slate-700">
+                                                    {item.industry}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-6 max-w-md">
+                                                <p className="text-sm text-slate-400 leading-relaxed">
+                                                    {item.reason || (item.analysis && item.analysis.reason)}
+                                                </p>
+                                                <div className="flex gap-2 mt-2">
+                                                    {(item.tags || (item.analysis && item.analysis.tags) || []).map(tag => (
+                                                        <span key={tag} className="text-[9px] text-indigo-300/70">#{tag}</span>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-6 text-right">
+                                                <a 
+                                                    href={item.url || item.website || (item.contactInfo && item.contactInfo.sourceUrl) || "#"} 
+                                                    target="_blank"
+                                                    className="inline-flex items-center gap-1 text-xs font-bold text-indigo-400 hover:text-white transition-colors bg-indigo-500/10 px-3 py-2 rounded-lg border border-indigo-500/20"
+                                                >
+                                                    查看线索 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr><td colSpan="4" className="py-20 text-center text-slate-600">无匹配线索</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <footer className="mt-8 text-center text-slate-600 text-[10px] tracking-widest uppercase">
+                            © {new Date().getFullYear()} 封焊商机智慧挖掘系统 · DATA REFRESH VIA GITHUB ACTIONS
+                        </footer>
+                    </div>
+                </div>
+            );
+        }
 
-      </div>
-    </div>
-  );
-}
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
