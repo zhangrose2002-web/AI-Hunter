@@ -1,24 +1,67 @@
 [
-    {
-        "name": "某传感器技术有限公司",
-        "industry": "MEMS/红外探测器",
-        "location": "江苏·无锡",
-        "reason": "该司近期扩产红外探测器生产线，对气密性封焊设备有潜在需求。",
-        "tags": [
-            "平行封焊",
-            "高气密性"
-        ],
-        "url": "http://example.com"
-    },
-    {
-        "name": "华南某功率半导体厂",
-        "industry": "碳化硅/IGBT",
-        "location": "广东·深圳",
-        "reason": "新增多条碳化硅模块封测产线，正在寻找激光封焊解决方案。",
-        "tags": [
-            "激光封焊",
-            "大功率模块"
-        ],
-        "url": "http://example.com"
-    }
+{
+"name": "江苏北微微电子技术有限公司",
+"industry": "MEMS/红外探测器",
+"location": "江苏·无锡",
+"reason": "该司近期启动红外传感器封装线二期扩产，对真空平行封焊设备有明确采购意向。",
+"tags": [
+"平行封焊",
+"真空封装",
+"高气密性"
+],
+"url": "http://www.bwsensing.com",
+"crawlTime": "2024-05-20 14:30"
+},
+{
+"name": "深圳致远功率半导体有限公司",
+"industry": "碳化硅 SiC/IGBT",
+"location": "广东·深圳",
+"reason": "新增多条车规级碳化硅模块封测产线，正在寻找大功率激光封焊自动化解决方案。",
+"tags": [
+"激光封焊",
+"大功率模块",
+"SiC封装"
+],
+"url": "https://www.google.com/search?q=http://example.com/news/sic-line",
+"crawlTime": "2024-05-20 14:35"
+},
+{
+"name": "晶赛科技股份有限公司",
+"industry": "石英晶体振荡器",
+"location": "安徽·铜陵",
+"reason": "作为国内石英晶振头部企业，持续更新高频小型化SMD封装线，对平行封焊机精度要求极高。",
+"tags": [
+"晶振封装",
+"小型化SMD",
+"高频器件"
+],
+"url": "http://www.jingsai.com",
+"crawlTime": "2024-05-20 14:40"
+},
+{
+"name": "武汉锐奥特科技有限公司",
+"industry": "光通信/TO管壳",
+"location": "湖北·武汉",
+"reason": "25G/100G光模块TO封装需求旺盛，正在评估国产气密性保护封焊设备以替代进口。",
+"tags": [
+"光通信",
+"TO-CAN封装",
+"国产替代"
+],
+"url": "http://www.rayoptek.com",
+"crawlTime": "2024-05-20 14:45"
+},
+{
+"name": "希磁电子科技有限公司",
+"industry": "MEMS电流传感器",
+"location": "浙江·宁波",
+"reason": "新建智能化传感器产业园，涉及多项气密性封焊工序招标。",
+"tags": [
+"电流传感器",
+"智能化产线",
+"招标意向"
+],
+"url": "https://www.google.com/search?q=http://www.x-magnetics.com",
+"crawlTime": "2024-05-20 14:50"
+}
 ]
