@@ -1,32 +1,22 @@
 [
   {
-    "id": 1769583203,
-    "company": "长电科技 (宿迁) 有限公司",
-    "location": "江苏·宿迁",
+    "id": 1,
+    "company": "长电科技 (JSCET)",
+    "location": "江苏·无锡",
     "category": "domestic",
-    "tag": "实锤公告",
-    "reason": "【中国招标平台发布】该司正在进行‘划片机及配套设备采购项目’招标，截标日期临近。检测时间：2026-01-28",
-    "website": "http://www.cebpubservice.com/",
-    "phone": "见招标文件"
+    "tag": "重点监控",
+    "reason": "先进封装（Chiplet）产线扩产中，持续关注其 BGA 焊球机与测试设备招标公告。 (系统同步于: 01-28 07:01 UTC)",
+    "website": "http://www.jcetglobal.com",
+    "phone": "0510-86851888"
   },
   {
-    "id": 1769583204,
-    "company": "通富微电 (高端封测项目)",
+    "id": 2,
+    "company": "通富微电 (TFME)",
     "location": "江苏·南通",
     "category": "domestic",
-    "tag": "中标公示",
-    "reason": "【中国招标平台发布】高端封测产线扩产项目设备采购中标结果已公示，涵盖多款测试机型。检测时间：2026-01-28",
-    "website": "http://www.cebpubservice.com/",
-    "phone": "见官网公示"
-  },
-  {
-    "id": 1769583205,
-    "company": "华天科技 (集成电路封装)",
-    "location": "甘肃·天水",
-    "category": "domestic",
-    "tag": "招标预告",
-    "reason": "【中国招标平台发布】集成电路多芯片封装扩大产能项目设备预询价公告已发布。检测时间：2026-01-28",
-    "website": "http://www.cebpubservice.com/",
-    "phone": "登录查询"
+    "tag": "重点监控",
+    "reason": "AMD 核心封测伙伴，苏通厂区高端封测项目设备采购公示，建议对接采购部。 (系统同步于: 01-28 07:01 UTC)",
+    "website": "http://www.tfme.com",
+    "phone": "0513-85058888"
   }
 ]
