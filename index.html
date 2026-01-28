@@ -33,11 +33,13 @@
     .status-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #94a3b8; }
     .pulse { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
     
+    /* Tabs & Search */
     .tabs { display: flex; background: rgba(15, 23, 42, 0.8); padding: 0.25rem; border-radius: 0.5rem; border: 1px solid var(--border); }
     .tab-btn { padding: 0.5rem 1.25rem; font-size: 0.75rem; color: #94a3b8; background: none; border: none; cursor: pointer; border-radius: 4px; }
     .tab-btn.active { background-color: #3b82f6; color: white; }
     .search-input { width: 100%; padding: 1rem; background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border); border-radius: 0.75rem; color: white; margin-bottom: 2.5rem; outline: none; }
     
+    /* Card Design */
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; transition: 0.3s; }
     .card:hover { border-color: var(--blue); background: rgba(15, 23, 42, 0.5); }
     .card-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -75,16 +77,50 @@
   </div>
 
   <script>
+    // ==========================================
+    // 数据存储区：Python 爬虫请将新数据写入下方数组中
+    // ==========================================
     /* DATA_START */
-    const leadsData = [];
+    const leadsData = [
+      {
+        id: 1,
+        company: "长电科技管理有限公司 (JCET)",
+        location: "江苏·无锡 / 上海",
+        category: "domestic",
+        reason: "近期完成了对晟碟半导体（SanDisk）80%股权的收购。急需针对高性能存储芯片（NAND Flash）的先进封装线测试设备。",
+        website: "www.jcetglobal.com",
+        phone: "0510-86856061",
+        tag: "龙头扩产"
+      },
+      {
+        id: 2,
+        company: "通富微电子股份有限公司",
+        location: "江苏·南通",
+        category: "domestic",
+        reason: "AMD核心封测伙伴。正大规模布局 2.5D/3D Chiplet 先进封装技术，对高性能固晶机有持续采购需求。",
+        website: "www.tfme.com",
+        phone: "0513-85055555",
+        tag: "先进封装"
+      },
+      {
+        id: 4,
+        company: "Amkor Technology (安靠)",
+        location: "上海 / 全球",
+        category: "intl",
+        reason: "全球第二大封测厂。汽车电子封装（SiP）产能扩张，重点关注车规级自动化封测设备。",
+        website: "www.amkor.com",
+        phone: "021-50801388",
+        tag: "外资巨头"
+      }
+    ];
     /* DATA_END */
+    // ==========================================
 
     let activeTab = 'all';
     let searchQuery = '';
 
     function render() {
       const list = document.getElementById('card-list');
-      if(!list) return;
       const filtered = leadsData.filter(item => {
         const matchesSearch = item.company.includes(searchQuery) || item.reason.includes(searchQuery);
         const matchesTab = activeTab === 'all' || item.category === activeTab;
@@ -97,18 +133,18 @@
         <div class="card">
           <div class="card-grid">
             <div>
-              <span class="tag">${item.tag || '实时线索'}</span>
+              <span class="tag">${item.tag}</span>
               <div class="company-name">${item.company}</div>
               <div style="font-size:12px; color:#94a3b8;">📍 ${item.location}</div>
             </div>
             <div class="reason-text">
-              <div style="font-size:11px; font-weight:bold; color:#3b82f6; margin-bottom:4px;">推荐理由与应用领域:</div>
+              <div style="font-size:11px; font-weight:bold; color:#3b82f6; margin-bottom:4px;">需求情报:</div>
               ${item.reason}
             </div>
             <div style="padding-left:15px; border-left:1px solid #334155;">
                <div style="font-size:11px; color:#94a3b8;">官方网站:</div>
                <div class="contact-value">${item.website}</div>
-               <div style="font-size:11px; color:#94a3b8; margin-top:10px;">联系电话:</div>
+               <div style="font-size:11px; color:#94a3b8; margin-top:10px;">联系方式:</div>
                <div class="contact-value" style="color:#10b981;">${item.phone}</div>
             </div>
           </div>
@@ -116,6 +152,7 @@
       `).join('');
     }
 
+    // 事件绑定
     document.getElementById('search-input').oninput = (e) => {
       searchQuery = e.target.value;
       render();
@@ -134,4 +171,3 @@
   </script>
 </body>
 </html>
-
