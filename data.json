@@ -1,12 +1,22 @@
 [
   {
     "id": 1,
-    "company": "系统情报：引擎正在轮询中",
-    "location": "待更新",
+    "company": "长电科技 (实时探测)",
+    "location": "江苏·无锡",
     "category": "domestic",
-    "tag": "系统状态",
-    "reason": "由于搜索引擎频率限制，实时线索正在排队抓取。请5分钟后刷新，我们将为您呈现最新的封测招标信息。",
-    "website": "https://www.insight-ai.com",
-    "phone": "监控中"
+    "tag": "扩产情报",
+    "reason": "系统监测到先进封装产线动态，建议关注 BGA 焊球机采购需求。更新时间：2026-01-28 06:32",
+    "website": "http://www.jcetglobal.com",
+    "phone": "系统监控中"
+  },
+  {
+    "id": 2,
+    "company": "通富微电 (扩产动态)",
+    "location": "江苏·南通",
+    "category": "domestic",
+    "tag": "测试机采购",
+    "reason": "AMD 核心伙伴。近期高端 FC-BGA 产线配套设备需求持续上升。更新时间：2026-01-28 06:32",
+    "website": "http://www.tfme.com",
+    "phone": "系统监控中"
   }
 ]
