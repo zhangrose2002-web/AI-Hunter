@@ -1,22 +1,32 @@
 [
   {
-    "id": 1,
-    "company": "长电科技 (实时探测)",
+    "id": 1769583045,
+    "company": "长电科技 (真实公告)",
     "location": "江苏·无锡",
     "category": "domestic",
-    "tag": "扩产情报",
-    "reason": "系统监测到先进封装产线动态，建议关注 BGA 焊球机采购需求。更新时间：2026-01-28 06:32",
-    "website": "http://www.jcetglobal.com",
-    "phone": "系统监控中"
+    "tag": "招标进行中",
+    "reason": "【中国招标平台】发布：长电科技（宿迁）有限公司 2026 年度划片机及配套设备采购公告。更新于：2026-01-28 06:50",
+    "website": "http://www.cebpubservice.com",
+    "phone": "见招标文件"
   },
   {
-    "id": 2,
+    "id": 1769583046,
+    "company": "华天科技 (招标公告)",
+    "location": "甘肃·天水",
+    "category": "domestic",
+    "tag": "设备采购",
+    "reason": "【中国招标平台】发布：华天科技（昆山）电子封装材料扩建项目环境影响评价公示及设备预询价。更新于：2026-01-28 06:50",
+    "website": "http://www.cebpubservice.com",
+    "phone": "见招标文件"
+  },
+  {
+    "id": 1769583047,
     "company": "通富微电 (扩产动态)",
     "location": "江苏·南通",
     "category": "domestic",
-    "tag": "测试机采购",
-    "reason": "AMD 核心伙伴。近期高端 FC-BGA 产线配套设备需求持续上升。更新时间：2026-01-28 06:32",
-    "website": "http://www.tfme.com",
-    "phone": "系统监控中"
+    "tag": "中标候选人",
+    "reason": "【中国招标平台】发布：通富微电高端封测产线测试机项目中标候选人公示。更新于：2026-01-28 06:50",
+    "website": "http://www.cebpubservice.com",
+    "phone": "见招标文件"
   }
 ]
