@@ -9,44 +9,76 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+import requests
+from bs4 import BeautifulSoup
+import urllib.parse
+import time
+from datetime import datetime
+
 def fetch_industry_leads():
-    print("🚀 正在启动真实爬虫引擎，扫描行业公开情报...")
+    # --- 核心关键词库 ---
+    # 包含单词监控和组合逻辑监控
+    raw_keywords = [
+        "800G光模块", "EML激光器", "高速光收发", "CPO技术", "产线扩能", 
+        "车规级认证", "IGBT模块", "SiC功率器件", "新增产线招标", "OBC封装", 
+        "石英晶体振荡器", "KDS/精工替代", "SMD封装", "频率元件", "产能翻倍", 
+        "微波组件", "厚膜电路", "金属管壳封装", "国产化替代", "自主可控", 
+        "MEMS传感器", "红外探测器", "真空封装", "小批量试产", "工艺研发", 
+        "先进封装", "气密性测试", "系统级封装(SiP)", "先进封测项目公示", 
+        "TO-CAN封装", "激光雷达", "光电探测器", "二极管封装", "扩建厂房",
+        '"产能翻倍" + "TO-CAN封装"', '"产线扩能" + "IGBT模块封装"', 
+        '"增产" + "光收发组件(TOSA)"', '"自主可控" + "气密性封装设备"', 
+        '"国产替代" + "真空平行缝焊机"', '"核心装备" + "微波组件封装"', 
+        '"小批量试产" + "SiC功率模块"', '"工艺研发" + "MEMS真空封装"', 
+        '"打样" + "激光封焊工艺"'
+    ]
+
+    print(f"🚀 引擎启动：正在对 {len(raw_keywords)} 组核心关键词进行深度线索探测...")
     real_leads = []
-    
-    # 示例：抓取某个行业公告页（这里填入你关注的招标网或新闻地址）
-    target_url = "https://www.example-bidding.com/search?q=封焊机" 
-    
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(target_url, timeout=10, headers=headers)
-        response.encoding = 'utf-8'
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+    }
+
+    # 为了避免被搜索引擎封禁，我们随机抽取 5-8 组关键词进行单次轮询
+    import random
+    selected_kws = random.sample(raw_keywords, min(8, len(raw_keywords)))
+
+    for kw in selected_kws:
+        # 处理组合搜索逻辑：把 "A" + "B" 转换为搜索引擎识别的 A B
+        search_query = kw.replace('"', '').replace('+', ' ')
+        encoded_query = urllib.parse.quote(search_query)
         
-        if response.status_code == 200:
+        # 使用 Bing 搜索进行全网探测
+        url = f"https://www.bing.com/search?q={encoded_query}"
+        
+        try:
+            time.sleep(1) # 避开频率限制
+            response = requests.get(url, headers=headers, timeout=10)
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # 假设网页上的每一条公告都在 <div class="news-item"> 里
-            # 这部分需要根据你目标网站的 HTML 结构具体调整
-            items = soup.find_all('div', class_='news-item') 
-            
-            for i, item in enumerate(items[:5]): # 只取前5条最新线索
-                real_leads.append({
-                    "id": int(datetime.now().timestamp()) + i,
-                    "company": item.find('span', class_='company').text.strip(),
-                    "location": "情报解析中",
-                    "category": "domestic",
-                    "tag": "实时招标",
-                    "reason": item.find('a').text.strip(), # 抓取标题作为理由
-                    "website": target_url,
-                    "phone": "见原公告"
-                })
-        
-        if not real_leads:
-            print("⚠️ 未能从目标网页解析到数据，请检查选择器结构。")
-            
-    except Exception as e:
-        print(f"❌ 真实抓取失败: {e}")
-        
-    return real_leads if real_leads else fetch_mock_data() # 如果抓不到就回退到模拟数据
+            # 解析搜索结果
+            items = soup.find_all('li', class_='b_algo', limit=2) # 每个词取前2条最相关的
+            for i, item in enumerate(items):
+                title_elem = item.find('h2')
+                snippet_elem = item.find('p')
+                link_elem = item.find('a')
+
+                if title_elem and link_elem:
+                    real_leads.append({
+                        "id": int(datetime.now().timestamp()) + random.randint(1, 1000),
+                        "company": title_elem.text[:25], # 截取标题前段作为参考机构
+                        "location": "全网探测",
+                        "category": "domestic" if "替代" in kw or "国产" in kw else "intl",
+                        "tag": kw.replace('"', '').split('+')[0].strip(), # 提取第一个关键词做标签
+                        "reason": snippet_elem.text[:100] if snippet_elem else "点击链接查看详细招标/扩产详情...",
+                        "website": link_elem['href'],
+                        "phone": "见详情页公示"
+                    })
+            print(f"✅ 关键词 [{kw}] 探测完成")
+        except Exception as e:
+            print(f"⚠️ 关键词 [{kw}] 抓取异常: {e}")
+
+    return real_leads
 
 # ==========================================
 # 2. 生成 JSON 数据文件 (保持不变)
@@ -104,4 +136,5 @@ if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
     upload_to_server()
+
 
