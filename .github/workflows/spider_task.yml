@@ -36,17 +36,16 @@ jobs:
       - name: Run Spider Engine
         run: python spider.py
         # 此步会生成新的 data.json 并尝试上传 FTP
-
-      - name: Commit and Push Changes
+        
+- name: Commit and Push Changes
         run: |
           git config --global user.name "AI-Hunter-Bot"
           git config --global user.email "bot@insight.ai"
           
-          # 关键步骤：先拉取远程改动，并使用 rebase 模式避免冲突
-          git pull --rebase origin main
+          # 强制拉取最新的远程改动，防止被拒绝
+          git pull origin main --rebase
           
           git add data.json
           git commit -m "Update Leads Data: $(date)" || exit 0
-          
-          # 强制推送，确保数据一定能更新
           git push origin main
+     
