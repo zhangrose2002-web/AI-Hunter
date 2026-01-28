@@ -4,53 +4,62 @@ import ftplib
 from datetime import datetime
 
 # ==========================================
-# 1. 模拟抓取逻辑 (保持并优化)
+# 1. 模拟抓取逻辑 (字段名已修正，确保与 index.html 匹配)
 # ==========================================
 def fetch_industry_leads():
     print("开始执行全网线索搜寻...")
-    # 模拟抓取结果，确保字段名与前端 index.html 渲染逻辑完全一致
+    # 模拟抓取结果
+    # 注意：这里的键名必须与 index.html 中 item.xxx 的后缀完全一致
     new_leads = [
         {
-            "id": int(datetime.now().timestamp()),
-            "company": "某头部功率半导体厂",
-            "location": "广东·深圳",
+            "id": 1001,
+            "company": "长电科技（绍兴）有限公司", # 【修正】org_name -> company
+            "location": "浙江·绍兴",            # 【修正】region -> location
             "category": "domestic",
-            "reason": "新增 [SiC功率器件] 封装产线招标，急需 [真空平行缝焊机] 及气密性检测设备。",
-            "website": "cs.bj77.cn",
-            "phone": "见官网公告",
-            "tag": "新增产线"
+            "tag": "FC-BGA扩产",
+            "reason": "推荐理由：国家集成电路产业基金增持。应用领域：高端 FC-BGA 封装线扩产，急需固晶机与焊线机设备。", # 【修正】reason_field -> reason
+            "website": "http://www.jcetglobal.com",
+            "phone": "0575-88886666"
         },
         {
-            "id": int(datetime.now().timestamp()) + 1,
-            "company": "Global Opto-Tech Inc.",
-            "location": "新加坡 / 海外",
-            "category": "intl",
-            "reason": "[800G光模块] 产能翻倍计划启动，涉及 [TO-CAN封装] 及 [EML激光器] 封焊工艺升级。",
-            "website": "globalopto.com",
-            "phone": "Global Office",
-            "tag": "产能翻倍"
+            "id": 1002,
+            "company": "通富微电总部",
+            "location": "江苏·南通",
+            "category": "domestic",
+            "tag": "先进封装",
+            "reason": "推荐理由：AMD 核心封测伙伴。应用领域：7nm/5nm 先进封装扩产，正进行大规模设备招标。",
+            "website": "http://www.tfme.com",
+            "phone": "0513-85055555"
+        },
+        {
+            "id": 1003,
+            "company": "华天科技（昆山）",
+            "location": "江苏·昆山",
+            "category": "domestic",
+            "tag": "TSV技术",
+            "reason": "推荐理由：TSV 封装技术领先。应用领域：CIS 图像传感器封装，产线技术升级改造中。",
+            "website": "http://www.ht-tech.com",
+            "phone": "0512-57351111"
         }
     ]
     return new_leads
 
 # ==========================================
-# 2. 生成 JSON 数据文件 (核心改变：不再改写 HTML)
+# 2. 生成 JSON 数据文件 (保持不变)
 # ==========================================
 def save_to_json(data):
     file_path = 'data.json'
     try:
         with open(file_path, 'w', encoding='utf-8') as f:
-            # indent=2 让文件有缩进，方便人工查看
             json.dump(data, f, ensure_ascii=False, indent=2)
-        print(f"✅ 数据已写入本地 {file_path}")
+        print(f"✅ 数据已成功写入本地 {file_path}")
     except Exception as e:
         print(f"❌ 写入 JSON 失败: {e}")
 
 # ==========================================
-# 3. 传回阿里云虚拟空间
+# 3. 传回阿里云虚拟空间 (保持不变)
 # ==========================================
 def upload_to_server():
-    # FTP 信息保持不变
     FTP_SERVER = "qxu1590320302.my3w.com"
     FTP_USER = "qxu1590320302"
     FTP_PASS = "123456ab"
@@ -67,9 +76,7 @@ def upload_to_server():
         except:
             print("已经在根目录或 htdocs 无法访问")
         
-        # 【关键】增加 data.json 到同步列表
-        # 既然 index.html 现在是动态加载，我们其实只需要传 data.json 即可
-        # 但如果是第一次部署，还是建议把 HTML 也传上去
+        # 确保同步最新的三个核心文件
         files_to_send = ['index.html', 'spider.html', 'data.json']
         
         for file_name in files_to_send:
@@ -81,7 +88,7 @@ def upload_to_server():
                 print(f"⚠️ 跳过: 本地未找到 {file_name}")
 
         session.quit()
-        print(f"✨ 实时同步完成！访问地址: http://cs.bj77.cn/")
+        print(f"✨ 实时同步完成！")
         
     except Exception as e:
         print(f"❌ 传输失败: {e}")
@@ -90,11 +97,6 @@ def upload_to_server():
 # 4. 统一执行入口
 # ==========================================
 if __name__ == "__main__":
-    # 第一步：获取数据
     leads = fetch_industry_leads()
-    
-    # 第二步：保存为 data.json (首页会通过 fetch 读取这个文件)
     save_to_json(leads)
-    
-    # 第三步：将更新后的文件推送到阿里云
     upload_to_server()
