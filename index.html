@@ -33,13 +33,11 @@
     .status-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #94a3b8; }
     .pulse { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
     
-    /* Tabs & Search */
     .tabs { display: flex; background: rgba(15, 23, 42, 0.8); padding: 0.25rem; border-radius: 0.5rem; border: 1px solid var(--border); }
     .tab-btn { padding: 0.5rem 1.25rem; font-size: 0.75rem; color: #94a3b8; background: none; border: none; cursor: pointer; border-radius: 4px; }
     .tab-btn.active { background-color: #3b82f6; color: white; }
     .search-input { width: 100%; padding: 1rem; background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border); border-radius: 0.75rem; color: white; margin-bottom: 2.5rem; outline: none; }
     
-    /* Card Design */
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; transition: 0.3s; }
     .card:hover { border-color: var(--blue); background: rgba(15, 23, 42, 0.5); }
     .card-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -78,26 +76,20 @@
   </div>
 
   <script>
-    // 1. 初始化空数组，等待外部 JSON 加载
     let leadsData = [];
     let activeTab = 'all';
     let searchQuery = '';
 
-    // 2. 核心渲染函数
     function render() {
       const list = document.getElementById('card-list');
-      
-      // 处理搜索词：去除两端空格并统一转为小写
       const cleanQuery = searchQuery.trim().toLowerCase();
 
       const filtered = leadsData.filter(item => {
-        // 安全处理：确保字段存在，防止爬虫抓取到空字段导致报错
         const company = (item.company || "").toLowerCase();
         const reason = (item.reason || "").toLowerCase();
         const location = (item.location || "").toLowerCase();
         const tag = (item.tag || "").toLowerCase();
 
-        // 扩展搜索范围：不仅搜公司和理由，地区和标签也纳入搜索，提高容错率
         const matchesSearch = cleanQuery === "" || 
                              company.includes(cleanQuery) || 
                              reason.includes(cleanQuery) ||
@@ -105,14 +97,8 @@
                              tag.includes(cleanQuery);
 
         const matchesTab = activeTab === 'all' || item.category === activeTab;
-        
         return matchesSearch && matchesTab;
       });
-
-      // 状态切换显示
-      document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
-      
-      // 渲染列表... (保持原有的 map 部分代码不变)
 
       document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
       
@@ -139,25 +125,28 @@
       `).join('');
     }
 
-    // 3. 异步获取数据逻辑
     window.onload = async () => {
       const loadingEl = document.getElementById('loading-state');
       try {
-        // fetch 时加上时间戳，强制跳过 GitHub Pages 的缓存，确保看到的是最新抓取结果
-        const response = await fetch('data.json?t=' + new Date().getTime()); 
+        // 核心修改：增加 cache: "no-cache" 彻底干掉 GitHub Pages 缓存
+        const response = await fetch('data.json?t=' + new Date().getTime(), {
+            cache: "no-cache"
+        }); 
+        
         if (!response.ok) throw new Error("无法读取 data.json");
         
         leadsData = await response.json();
-        loadingEl.style.display = 'none'; // 隐藏加载中
-        render(); // 首次渲染
+        console.log("数据加载成功:", leadsData); // 调试用
+        
+        loadingEl.style.display = 'none';
+        render();
       } catch (e) {
         console.error("加载数据失败:", e);
-        loadingEl.innerHTML = "❌ 数据加载失败，请确认 data.json 是否已生成。";
+        loadingEl.innerHTML = "❌ 数据加载失败，请确认爬虫任务是否成功运行。";
         loadingEl.style.color = "#ef4444";
       }
     };
 
-    // 4. 事件绑定
     document.getElementById('search-input').oninput = (e) => {
       searchQuery = e.target.value;
       render();
@@ -174,4 +163,3 @@
   </script>
 </body>
 </html>
-
