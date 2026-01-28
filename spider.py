@@ -94,6 +94,19 @@ def upload_to_server():
     except Exception as e:
         print(f"❌ 传输失败: {e}")
 
+# 建议在 spider.py 的上传部分增加一层判断
+try:
+    session.login(FTP_USER, FTP_PASS)
+    session.set_pasv(True)
+    
+    # 尝试进入目录，如果进不去说明已经在里面了
+    try:
+        session.cwd('/htdocs')
+    except:
+        print("已经在根目录或 htdocs 无法访问")
+        
+    # 执行上传...
+
 # ==========================================
 # 4. 统一执行入口
 # ==========================================
@@ -106,3 +119,4 @@ if __name__ == "__main__":
     
     # 第三步：将更新后的 HTML 推送到阿里云空间
     upload_to_server()
+
