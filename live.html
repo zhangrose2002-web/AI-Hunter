@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>LIVE MONITORING - AI HUNTER</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 20px; line-height: 1.5; }
+        .cmd { color: #fff; }
+        .time { color: #888; }
+    </style>
+</head>
+<body>
+    <div id="console">
+        <div>[系统初始化] 实时监控模块已就绪...</div>
+        <div>[节点] Aliyun-qxu1590320302 连接正常</div>
+    </div>
+    <script>
+        // 这里的逻辑可以简单模拟实时滚动
+        setInterval(() => {
+            const div = document.createElement('div');
+            div.innerHTML = `<span class="time">[${new Date().toLocaleTimeString()}]</span> <span class="cmd">PING</span> master_server -> DATA_SYNC_OK`;
+            document.getElementById('console').appendChild(div);
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 3000);
+    </script>
+</body>
+</html>
