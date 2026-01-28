@@ -10,11 +10,7 @@ from datetime import datetime
 
 def fetch_industry_leads():
     # 1. 精简关键词（去掉所有引号和加号，提高搜索成功率）
-    raw_keywords = [
-        "800G光模块 扩产", "IGBT模块 招标", "SiC功率器件 产线", 
-        "MEMS传感器 封装", "激光雷达 封测项目", "真空平行缝焊机 国产替代",
-        "先进封装 招标公告", "半导体 扩建厂房公示"
-    ]
+    raw_keywords = ["半导体 招标", "封测 扩产", "光模块 采购", "通富微电 新闻", "长电科技 公告"]
     
     import random
     selected_kws = random.sample(raw_keywords, min(5, len(raw_keywords)))
@@ -40,7 +36,7 @@ def fetch_industry_leads():
             # 兼容性解析：尝试多种可能的搜索结果标签
             items = soup.select('.b_algo') or soup.select('li.b_algo')
             
-            for item in items[:3]:
+            for item in items[:10]:
                 title = item.find('h2').get_text() if item.find('h2') else ""
                 link = item.find('a')['href'] if item.find('a') else "#"
                 snippet = item.find('p').get_text() if item.find('p') else "查看详情..."
@@ -134,6 +130,7 @@ if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
     upload_to_server()
+
 
 
 
