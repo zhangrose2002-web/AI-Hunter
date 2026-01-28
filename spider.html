@@ -22,13 +22,16 @@
         .kw-group { margin-bottom: 20px; }
         .kw-title { font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
         .tags-area { display: flex; flex-wrap: wrap; gap: 8px; }
-        .kw-tag { background: #1e293b; border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .kw-tag { background: #1e293b; border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: 0.2s; user-select: none; }
         .kw-tag.active { border-color: var(--blue); color: var(--blue); background: rgba(59, 130, 246, 0.1); }
         
         /* 操作按钮 */
-        .btn-run { width: 100%; padding: 15px; background: var(--blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        .btn-run { width: 100%; padding: 15px; background: var(--blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .btn-run:hover { background: #2563eb; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        input[type="text"] { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; margin-top: 10px; }
+        .btn-run:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; box-shadow: none; }
+        
+        input[type="text"] { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; margin-top: 10px; outline: none; }
+        input[type="text"]:focus { border-color: var(--blue); }
     </style>
 </head>
 <body>
@@ -76,49 +79,83 @@
             <h2> 🚀 爬虫引擎参数</h2>
             <div style="margin-bottom: 15px;">
                 <label style="font-size: 12px; color: #94a3b8;">探测深度</label>
-                <select style="width:100%; padding:10px; background:#0f172a; color:white; border:1px solid var(--border);">
-                    <option>全网实时情报 (快速)</option>
-                    <option>深度行业报告 (慢速)</option>
-                    <option>招标/公告定向监控</option>
+                <select id="spider-depth" style="width:100%; padding:10px; background:#0f172a; color:white; border:1px solid var(--border); border-radius: 6px;">
+                    <option value="fast">全网实时情报 (快速)</option>
+                    <option value="deep">深度行业报告 (慢速)</option>
+                    <option value="monitor">招标/公告定向监控</option>
                 </select>
             </div>
             <div style="margin-bottom: 15px;">
                 <label style="font-size: 12px; color: #94a3b8;">采集节点</label>
                 <div style="font-size: 12px; margin-top:5px;">
-                    <input type="checkbox" checked> GitHub US-East (国外) <br>
-                    <input type="checkbox" checked> Proxy-Node CN (国内)
+                    <input type="checkbox" checked disabled> GitHub US-East (国外) <br>
+                    <input type="checkbox" checked disabled> Proxy-Node CN (国内)
                 </div>
             </div>
-            <button class="btn-run" onclick="triggerSpider()">启动全球线索采集</button>
-            <div id="status-msg" style="margin-top:15px; font-size:12px; color:var(--amber); text-align:center;"></div>
+            <button class="btn-run" id="run-btn" onclick="triggerSpider()">启动全球线索采集</button>
+            <div id="status-msg" style="margin-top:15px; font-size:12px; color:var(--amber); text-align:center; line-height: 1.6;"></div>
         </div>
     </div>
 
     <script>
-        // 处理标签点击
+        // 1. 处理标签点击（保持原有交互）
         document.querySelectorAll('.kw-tag').forEach(tag => {
             tag.onclick = () => tag.classList.toggle('active');
         });
 
-        // 触发 GitHub Actions
+        // 2. 核心触发函数
         async function triggerSpider() {
+            const btn = document.getElementById('run-btn');
             const msg = document.getElementById('status-msg');
-            msg.innerText = "正在通过 Webhook 唤醒 GitHub Actions...";
             
-            // 这里替换为你自己的 GitHub 信息
-            const GITHUB_TOKEN = "你的_GITHUB_TOKEN"; 
-            const REPO_OWNER = "你的用户名";
-            const REPO_NAME = "你的仓库名";
+            // --- 配置区 ---
+            // 请在此处填入你的真实信息
+            const GITHUB_TOKEN = "你的_GITHUB_PERSONAL_ACCESS_TOKEN"; 
+            const REPO_OWNER = "zhangrose2002-web";
+            const REPO_NAME = "AI-Hunter";
+            // --------------
+
+            // 获取当前选中的所有关键词
+            const selectedKeywords = Array.from(document.querySelectorAll('.kw-tag.active')).map(t => t.innerText);
+            const customQuery = document.getElementById('custom-query').value;
+            const depth = document.getElementById('spider-depth').value;
+
+            // 状态更新
+            btn.disabled = true;
+            msg.style.color = "var(--amber)";
+            msg.innerHTML = "📡 正在加密发送指令至 GitHub Actions...<br>请勿关闭页面";
 
             try {
-                // 模拟发送指令
-                console.log("正在发送关键词至爬虫后端...");
-                setTimeout(() => {
-                    msg.innerHTML = "✅ 指令已送达！<br>正在分配 GitHub Runner 节点...";
-                    // 实际开发时这里使用 fetch 调用 GitHub API
-                }, 1500);
+                // 调用 GitHub API 的 repository_dispatch 接口
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        event_type: 'run_spider', // 必须与 .yml 文件中的 types 对应
+                        client_payload: {
+                            keywords: selectedKeywords,
+                            custom_query: customQuery,
+                            depth: depth
+                        }
+                    })
+                });
+
+                if (response.status === 204) { // GitHub 成功接收 Dispatch 的状态码是 204
+                    msg.style.color = "#10b981"; // 成功绿
+                    msg.innerHTML = "✅ 任务已成功排队！<br>云端爬虫已启动，预计 2 分钟后数据同步至首页。";
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "权限验证失败");
+                }
             } catch (e) {
-                msg.innerText = "发送失败，请检查网络";
+                console.error(e);
+                msg.style.color = "#ef4444"; // 错误红
+                msg.innerHTML = `❌ 触发失败<br>原因：${e.message}<br>请检查 Token 权限或仓库名称。`;
+                btn.disabled = false;
             }
         }
     </script>
