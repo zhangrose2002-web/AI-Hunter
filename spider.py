@@ -7,6 +7,7 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+print(f"DEBUG: Response Status Code: {response.status_code}")
 
 def fetch_industry_leads():
     # 1. 精简关键词（去掉所有引号和加号，提高搜索成功率）
@@ -139,4 +140,5 @@ if __name__ == "__main__":
     save_to_json(leads)
     # 暂时注释掉 FTP，先确保 GitHub 这边能跑通
     # upload_to_server()
+
 
