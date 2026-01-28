@@ -1,15 +1,14 @@
 import os
-import re
 import json
 import ftplib
 from datetime import datetime
 
 # ==========================================
-# 1. 模拟抓取逻辑
+# 1. 模拟抓取逻辑 (保持并优化)
 # ==========================================
 def fetch_industry_leads():
     print("开始执行全网线索搜寻...")
-    # 这里是你的关键词抓取结果汇总
+    # 模拟抓取结果，确保字段名与前端 index.html 渲染逻辑完全一致
     new_leads = [
         {
             "id": int(datetime.now().timestamp()),
@@ -35,32 +34,23 @@ def fetch_industry_leads():
     return new_leads
 
 # ==========================================
-# 2. 更新本地 index.html
+# 2. 生成 JSON 数据文件 (核心改变：不再改写 HTML)
 # ==========================================
-def update_index_html(new_data):
-    file_path = 'index.html'
-    if not os.path.exists(file_path):
-        print(f"❌ 错误: 找不到 {file_path} 文件")
-        return
-
-    with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    # 匹配首页中的数据标记区
-    pattern = r'/\* DATA_START \*/(.*?)/\* DATA_END \*/'
-    js_data_str = f"\n    const leadsData = {json.dumps(new_data, ensure_ascii=False, indent=6)};\n    "
-    
-    new_content = re.sub(pattern, f"/* DATA_START */{js_data_str}/* DATA_END */", content, flags=re.DOTALL)
-
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(new_content)
-    print("✅ 首页数据本地更新完成。")
+def save_to_json(data):
+    file_path = 'data.json'
+    try:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            # indent=2 让文件有缩进，方便人工查看
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print(f"✅ 数据已写入本地 {file_path}")
+    except Exception as e:
+        print(f"❌ 写入 JSON 失败: {e}")
 
 # ==========================================
-# 3. 传回阿里云虚拟空间 (核心处理)
+# 3. 传回阿里云虚拟空间
 # ==========================================
 def upload_to_server():
-    # 直接填入你的阿里云 FTP 信息
+    # FTP 信息保持不变
     FTP_SERVER = "qxu1590320302.my3w.com"
     FTP_USER = "qxu1590320302"
     FTP_PASS = "123456ab"
@@ -70,15 +60,17 @@ def upload_to_server():
         session = ftplib.FTP()
         session.connect(FTP_SERVER, 21, timeout=30)
         session.login(FTP_USER, FTP_PASS)
-        
-        # 阿里云主机必须开启被动模式
         session.set_pasv(True)
         
-        # 阿里云主机的网页根目录必须是 /htdocs
-        session.cwd('/htdocs')
+        try:
+            session.cwd('/htdocs')
+        except:
+            print("已经在根目录或 htdocs 无法访问")
         
-        # 定义需要同步的文件
-        files_to_send = ['index.html', 'spider.html', 'live.html']
+        # 【关键】增加 data.json 到同步列表
+        # 既然 index.html 现在是动态加载，我们其实只需要传 data.json 即可
+        # 但如果是第一次部署，还是建议把 HTML 也传上去
+        files_to_send = ['index.html', 'spider.html', 'data.json']
         
         for file_name in files_to_send:
             if os.path.exists(file_name):
@@ -94,29 +86,15 @@ def upload_to_server():
     except Exception as e:
         print(f"❌ 传输失败: {e}")
 
-# 建议在 spider.py 的上传部分增加一层判断
-try:
-    session.login(FTP_USER, FTP_PASS)
-    session.set_pasv(True)
-    
-    # 尝试进入目录，如果进不去说明已经在里面了
-    try:
-        session.cwd('/htdocs')
-    except:
-        print("已经在根目录或 htdocs 无法访问")
-        
-    # 执行上传...
-
 # ==========================================
 # 4. 统一执行入口
 # ==========================================
 if __name__ == "__main__":
-    # 第一步：模拟或实际爬取数据
+    # 第一步：获取数据
     leads = fetch_industry_leads()
     
-    # 第二步：将数据写入本地 HTML 模板
-    update_index_html(leads)
+    # 第二步：保存为 data.json (首页会通过 fetch 读取这个文件)
+    save_to_json(leads)
     
-    # 第三步：将更新后的 HTML 推送到阿里云空间
+    # 第三步：将更新后的文件推送到阿里云
     upload_to_server()
-
