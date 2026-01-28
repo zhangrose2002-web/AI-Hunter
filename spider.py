@@ -1,18 +1,11 @@
 import os
 import json
 import ftplib
-from datetime import datetime
-
-# ==========================================
-# 1. 模拟抓取逻辑 (字段名已修正，确保与 index.html 匹配)
-# ==========================================
-import requests
-from bs4 import BeautifulSoup
-
-import requests
-from bs4 import BeautifulSoup
-import urllib.parse
 import time
+import random  # 确保这个在这里
+import urllib.parse
+import requests
+from bs4 import BeautifulSoup
 from datetime import datetime
 
 def fetch_industry_leads():
@@ -136,5 +129,6 @@ if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
     upload_to_server()
+
 
 
