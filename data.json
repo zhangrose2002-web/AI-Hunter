@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": 1,
+    "company": "系统情报：引擎正在轮询中",
+    "location": "待更新",
+    "category": "domestic",
+    "tag": "系统状态",
+    "reason": "由于搜索引擎频率限制，实时线索正在排队抓取。请5分钟后刷新，我们将为您呈现最新的封测招标信息。",
+    "website": "https://www.insight-ai.com",
+    "phone": "监控中"
+  }
+]
