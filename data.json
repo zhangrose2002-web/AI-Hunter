@@ -1,32 +1,32 @@
 [
   {
-    "id": 1769583045,
-    "company": "长电科技 (真实公告)",
-    "location": "江苏·无锡",
+    "id": 1769583203,
+    "company": "长电科技 (宿迁) 有限公司",
+    "location": "江苏·宿迁",
     "category": "domestic",
-    "tag": "招标进行中",
-    "reason": "【中国招标平台】发布：长电科技（宿迁）有限公司 2026 年度划片机及配套设备采购公告。更新于：2026-01-28 06:50",
-    "website": "http://www.cebpubservice.com",
+    "tag": "实锤公告",
+    "reason": "【中国招标平台发布】该司正在进行‘划片机及配套设备采购项目’招标，截标日期临近。检测时间：2026-01-28",
+    "website": "http://www.cebpubservice.com/",
     "phone": "见招标文件"
   },
   {
-    "id": 1769583046,
-    "company": "华天科技 (招标公告)",
-    "location": "甘肃·天水",
-    "category": "domestic",
-    "tag": "设备采购",
-    "reason": "【中国招标平台】发布：华天科技（昆山）电子封装材料扩建项目环境影响评价公示及设备预询价。更新于：2026-01-28 06:50",
-    "website": "http://www.cebpubservice.com",
-    "phone": "见招标文件"
-  },
-  {
-    "id": 1769583047,
-    "company": "通富微电 (扩产动态)",
+    "id": 1769583204,
+    "company": "通富微电 (高端封测项目)",
     "location": "江苏·南通",
     "category": "domestic",
-    "tag": "中标候选人",
-    "reason": "【中国招标平台】发布：通富微电高端封测产线测试机项目中标候选人公示。更新于：2026-01-28 06:50",
-    "website": "http://www.cebpubservice.com",
-    "phone": "见招标文件"
+    "tag": "中标公示",
+    "reason": "【中国招标平台发布】高端封测产线扩产项目设备采购中标结果已公示，涵盖多款测试机型。检测时间：2026-01-28",
+    "website": "http://www.cebpubservice.com/",
+    "phone": "见官网公示"
+  },
+  {
+    "id": 1769583205,
+    "company": "华天科技 (集成电路封装)",
+    "location": "甘肃·天水",
+    "category": "domestic",
+    "tag": "招标预告",
+    "reason": "【中国招标平台发布】集成电路多芯片封装扩大产能项目设备预询价公告已发布。检测时间：2026-01-28",
+    "website": "http://www.cebpubservice.com/",
+    "phone": "登录查询"
   }
 ]
