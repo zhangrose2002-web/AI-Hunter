@@ -86,12 +86,33 @@
     // 2. 核心渲染函数
     function render() {
       const list = document.getElementById('card-list');
+      
+      // 处理搜索词：去除两端空格并统一转为小写
+      const cleanQuery = searchQuery.trim().toLowerCase();
+
       const filtered = leadsData.filter(item => {
-        const matchesSearch = item.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                             item.reason.toLowerCase().includes(searchQuery.toLowerCase());
+        // 安全处理：确保字段存在，防止爬虫抓取到空字段导致报错
+        const company = (item.company || "").toLowerCase();
+        const reason = (item.reason || "").toLowerCase();
+        const location = (item.location || "").toLowerCase();
+        const tag = (item.tag || "").toLowerCase();
+
+        // 扩展搜索范围：不仅搜公司和理由，地区和标签也纳入搜索，提高容错率
+        const matchesSearch = cleanQuery === "" || 
+                             company.includes(cleanQuery) || 
+                             reason.includes(cleanQuery) ||
+                             location.includes(cleanQuery) ||
+                             tag.includes(cleanQuery);
+
         const matchesTab = activeTab === 'all' || item.category === activeTab;
+        
         return matchesSearch && matchesTab;
       });
+
+      // 状态切换显示
+      document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
+      
+      // 渲染列表... (保持原有的 map 部分代码不变)
 
       document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
       
@@ -153,3 +174,4 @@
   </script>
 </body>
 </html>
+
