@@ -42,11 +42,11 @@ jobs:
           git config --global user.name "AI-Hunter-Bot"
           git config --global user.email "bot@insight.ai"
           
-          # 确保只添加数据文件，避免冲突
-          git add data.json
+          # 关键步骤：先拉取远程改动，并使用 rebase 模式避免冲突
+          git pull --rebase origin main
           
-          # 提交更改。如果没有新变化（数据完全一致），则静默退出不报错
+          git add data.json
           git commit -m "Update Leads Data: $(date)" || exit 0
           
-          # 推送回 main 分支
-          git push
+          # 强制推送，确保数据一定能更新
+          git push origin main
