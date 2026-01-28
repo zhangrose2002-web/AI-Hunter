@@ -10,7 +10,15 @@ from datetime import datetime
 
 def fetch_industry_leads():
     # 1. 精简关键词（去掉所有引号和加号，提高搜索成功率）
-    raw_keywords = ["半导体 招标", "封测 扩产", "光模块 采购", "通富微电 新闻", "长电科技 公告"]
+  raw_keywords = [
+        "半导体 招标公告", 
+        "集成电路 扩产 新闻", 
+        "封测厂 采购 固晶机", 
+        "通富微电 官方公告", 
+        "长电科技 扩产项目",
+        "华天科技 招标",
+        "半导体 封测 基地 投产"
+    ]
     
     import random
     selected_kws = random.sample(raw_keywords, min(5, len(raw_keywords)))
@@ -130,6 +138,7 @@ if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
     upload_to_server()
+
 
 
 
