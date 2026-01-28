@@ -6,43 +6,47 @@ from datetime import datetime
 # ==========================================
 # 1. 模拟抓取逻辑 (字段名已修正，确保与 index.html 匹配)
 # ==========================================
+import requests
+from bs4 import BeautifulSoup
+
 def fetch_industry_leads():
-    print("开始执行全网线索搜寻...")
-    # 模拟抓取结果
-    # 注意：这里的键名必须与 index.html 中 item.xxx 的后缀完全一致
-    new_leads = [
-        {
-            "id": 1001,
-            "company": "长电科技（绍兴）有限公司", # 【修正】org_name -> company
-            "location": "浙江·绍兴",            # 【修正】region -> location
-            "category": "domestic",
-            "tag": "FC-BGA扩产",
-            "reason": "推荐理由：国家集成电路产业基金增持。应用领域：高端 FC-BGA 封装线扩产，急需固晶机与焊线机设备。", # 【修正】reason_field -> reason
-            "website": "http://www.jcetglobal.com",
-            "phone": "0575-88886666"
-        },
-        {
-            "id": 1002,
-            "company": "通富微电总部",
-            "location": "江苏·南通",
-            "category": "domestic",
-            "tag": "先进封装",
-            "reason": "推荐理由：AMD 核心封测伙伴。应用领域：7nm/5nm 先进封装扩产，正进行大规模设备招标。",
-            "website": "http://www.tfme.com",
-            "phone": "0513-85055555"
-        },
-        {
-            "id": 1003,
-            "company": "华天科技（昆山）",
-            "location": "江苏·昆山",
-            "category": "domestic",
-            "tag": "TSV技术",
-            "reason": "推荐理由：TSV 封装技术领先。应用领域：CIS 图像传感器封装，产线技术升级改造中。",
-            "website": "http://www.ht-tech.com",
-            "phone": "0512-57351111"
-        }
-    ]
-    return new_leads
+    print("🚀 正在启动真实爬虫引擎，扫描行业公开情报...")
+    real_leads = []
+    
+    # 示例：抓取某个行业公告页（这里填入你关注的招标网或新闻地址）
+    target_url = "https://www.example-bidding.com/search?q=封焊机" 
+    
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(target_url, timeout=10, headers=headers)
+        response.encoding = 'utf-8'
+        
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # 假设网页上的每一条公告都在 <div class="news-item"> 里
+            # 这部分需要根据你目标网站的 HTML 结构具体调整
+            items = soup.find_all('div', class_='news-item') 
+            
+            for i, item in enumerate(items[:5]): # 只取前5条最新线索
+                real_leads.append({
+                    "id": int(datetime.now().timestamp()) + i,
+                    "company": item.find('span', class_='company').text.strip(),
+                    "location": "情报解析中",
+                    "category": "domestic",
+                    "tag": "实时招标",
+                    "reason": item.find('a').text.strip(), # 抓取标题作为理由
+                    "website": target_url,
+                    "phone": "见原公告"
+                })
+        
+        if not real_leads:
+            print("⚠️ 未能从目标网页解析到数据，请检查选择器结构。")
+            
+    except Exception as e:
+        print(f"❌ 真实抓取失败: {e}")
+        
+    return real_leads if real_leads else fetch_mock_data() # 如果抓不到就回退到模拟数据
 
 # ==========================================
 # 2. 生成 JSON 数据文件 (保持不变)
@@ -100,3 +104,4 @@ if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
     upload_to_server()
+
