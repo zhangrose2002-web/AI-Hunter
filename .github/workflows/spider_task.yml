@@ -1,28 +1,20 @@
 name: AI Hunter Engine Sync
 
 on:
-  # 1. 响应 spider.html 控制台发出的远程指令
-  repository_dispatch:
-    types: [run-spider]
-  
-  # 2. 每天凌晨 2 点自动运行 (北京时间)
-  schedule:
-    - cron: '0 18 * * *' 
-  
-  # 3. 允许在 GitHub 界面上手动点击运行
   workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * *'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
-    # 必须显式声明写权限，否则无法推送数据回仓库
     permissions:
-      contents: write
-    
+      contents: write # 必须显式声明写权限
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 获取完整历史以解决冲突
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -30,22 +22,18 @@ jobs:
           python-version: '3.9'
 
       - name: Install Dependencies
-        run: |
-          pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4
 
       - name: Run Spider Engine
         run: python spider.py
-        # 此步会生成新的 data.json 并尝试上传 FTP
-        
-- name: Commit and Push Changes
+
+      - name: Commit and Push Changes
         run: |
-          git config --global user.name "AI-Hunter-Bot"
-          git config --global user.email "bot@insight.ai"
-          
-          # 强制拉取最新的远程改动，防止被拒绝
-          git pull origin main --rebase
-          
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git commit -m "Update Leads Data: $(date)" || exit 0
+          # 如果没有变化则不提交，防止报错
+          git commit -m "Auto-update data.json" || exit 0
+          # 使用 pull rebase 解决 [rejected] 冲突
+          git pull origin main --rebase
           git push origin main
-     
