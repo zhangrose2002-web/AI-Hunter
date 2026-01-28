@@ -137,13 +137,6 @@ def upload_to_server():
 if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
-    upload_to_server()
-
-
-
-
-
-
-
-
+    # 暂时注释掉 FTP，先确保 GitHub 这边能跑通
+    # upload_to_server()
 
