@@ -1,196 +1,173 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 猎人 - 封焊设备市场监测系统</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+SC:wght@400;700&display=swap');
-        body {
-            font-family: 'Inter', 'Noto Sans SC', sans-serif;
-            background-color: #020617;
-            color: #e2e8f0;
-        }
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
-        }
-        .loading-shimmer {
-            background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 猎人 INSIGHT - 封测行业客户线索</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+    :root {
+      --bg: #020617;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --card-bg: rgba(15, 23, 42, 0.3);
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --amber: #f59e0b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans SC', system-ui, sans-serif;
+      padding: 1rem;
+    }
+    .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(to right, #0891b2, #3b82f6, #6366f1); z-index: 50; }
+    .container { max-width: 88rem; margin: 0 auto; padding-top: 4rem; }
+    .header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1.5rem; margin-bottom: 2.5rem; }
+    .logo-text h1 { font-size: 1.875rem; font-weight: 900; }
+    .logo-text h1 .highlight { color: #3b82f6; }
+    .status-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #94a3b8; }
+    .pulse { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+    
+    /* Tabs & Search */
+    .tabs { display: flex; background: rgba(15, 23, 42, 0.8); padding: 0.25rem; border-radius: 0.5rem; border: 1px solid var(--border); }
+    .tab-btn { padding: 0.5rem 1.25rem; font-size: 0.75rem; color: #94a3b8; background: none; border: none; cursor: pointer; border-radius: 4px; }
+    .tab-btn.active { background-color: #3b82f6; color: white; }
+    .search-input { width: 100%; padding: 1rem; background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border); border-radius: 0.75rem; color: white; margin-bottom: 2.5rem; outline: none; }
+    
+    /* Card Design */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; transition: 0.3s; }
+    .card:hover { border-color: var(--blue); background: rgba(15, 23, 42, 0.5); }
+    .card-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 768px) { .card-grid { grid-template-columns: 250px 1fr 280px; } }
+    .tag { display: inline-block; padding: 2px 8px; font-size: 11px; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid #3b82f6; border-radius: 4px; margin-bottom: 10px; }
+    .company-name { font-size: 1.25rem; font-weight: 700; margin-bottom: 5px; }
+    .reason-text { color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; border-left: 2px solid var(--border); padding-left: 15px; }
+    .contact-value { font-family: monospace; font-size: 0.85rem; color: #60a5fa; margin-top: 5px; }
+    .footer { text-align: center; color: #64748b; font-size: 12px; margin-top: 50px; padding-bottom: 30px; }
+  </style>
 </head>
 <body>
-    <div id="root"></div>
+  <div class="top-bar"></div>
+  <div class="container">
+    <header class="header">
+      <div class="logo-text">
+        <h1>AI 猎人 <span class="highlight">INSIGHT</span></h1>
+        <div class="status-badge"><div class="pulse"></div> 封测行业线索实时引擎</div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="all">全部线索</button>
+        <button class="tab-btn" data-tab="domestic">中国本土</button>
+        <button class="tab-btn" data-tab="intl">国际巨头</button>
+      </div>
+    </header>
 
-    <script type="text/babel">
-        const { useState, useMemo, useEffect } = React;
+    <input type="text" class="search-input" id="search-input" placeholder="输入机构、地区或关键词筛选..." />
 
-        function App() {
-            const [rawData, setRawData] = useState([]);
-            const [loading, setLoading] = useState(true);
-            const [error, setError] = useState(null);
-            const [searchTerm, setSearchTerm] = useState("");
-            const [filterRegion, setFilterRegion] = useState("全部");
+    <div id="card-list"></div>
+    <div id="empty-state" style="display:none; text-align:center; padding:50px; color:#64748b;">未找到匹配结果</div>
 
-            // 自动加载 GitHub 仓库中的 data.json
-            useEffect(() => {
-                const fetchData = async () => {
-                    try {
-                        // 添加随机参数防止缓存
-                        const response = await fetch(`data.json?t=${new Date().getTime()}`);
-                        if (!response.ok) throw new Error('数据文件加载失败');
-                        const data = await response.json();
-                        
-                        // 兼容两种格式：直接数组 或 带 metadata 的对象
-                        const list = Array.isArray(data) ? data : (data.customers || []);
-                        setRawData(list);
-                    } catch (err) {
-                        setError(err.message);
-                    } finally {
-                        setLoading(false);
-                    }
-                };
-                fetchData();
-            }, []);
+    <footer class="footer">
+      PROPRIETARY DATA ENGINE © 2026. OFFICIAL CONTACTS ONLY.
+    </footer>
+  </div>
 
-            const filteredData = useMemo(() => {
-                return rawData.filter(item => {
-                    const searchStr = searchTerm.toLowerCase();
-                    // 适配爬虫脚本输出的字段名
-                    const name = (item.name || "").toLowerCase();
-                    const industry = (item.industry || "").toLowerCase();
-                    const reason = (item.reason || (item.analysis && item.analysis.reason) || "").toLowerCase();
-                    
-                    const matchesSearch = name.includes(searchStr) || industry.includes(searchStr) || reason.includes(searchStr);
-                    
-                    // 地区识别逻辑
-                    const loc = item.location || "";
-                    const province = typeof loc === 'object' ? loc.province : loc;
-                    const isChina = ["江苏", "广东", "湖北", "浙江", "安徽", "北京", "上海", "深圳", "无锡", "武汉"].some(p => province && province.includes(p));
-                    const regionCategory = isChina ? "中国" : "国际";
+  <script>
+    // ==========================================
+    // 数据存储区：Python 爬虫请将新数据写入下方数组中
+    // ==========================================
+    /* DATA_START */
+    const leadsData = [
+      {
+        id: 1,
+        company: "长电科技管理有限公司 (JCET)",
+        location: "江苏·无锡 / 上海",
+        category: "domestic",
+        reason: "近期完成了对晟碟半导体（SanDisk）80%股权的收购。急需针对高性能存储芯片（NAND Flash）的先进封装线测试设备。",
+        website: "www.jcetglobal.com",
+        phone: "0510-86856061",
+        tag: "龙头扩产"
+      },
+      {
+        id: 2,
+        company: "通富微电子股份有限公司",
+        location: "江苏·南通",
+        category: "domestic",
+        reason: "AMD核心封测伙伴。正大规模布局 2.5D/3D Chiplet 先进封装技术，对高性能固晶机有持续采购需求。",
+        website: "www.tfme.com",
+        phone: "0513-85055555",
+        tag: "先进封装"
+      },
+      {
+        id: 4,
+        company: "Amkor Technology (安靠)",
+        location: "上海 / 全球",
+        category: "intl",
+        reason: "全球第二大封测厂。汽车电子封装（SiP）产能扩张，重点关注车规级自动化封测设备。",
+        website: "www.amkor.com",
+        phone: "021-50801388",
+        tag: "外资巨头"
+      }
+    ];
+    /* DATA_END */
+    // ==========================================
 
-                    const matchesRegion = filterRegion === "全部" || regionCategory === filterRegion;
-                    return matchesSearch && matchesRegion;
-                });
-            }, [searchTerm, filterRegion, rawData]);
+    let activeTab = 'all';
+    let searchQuery = '';
 
-            return (
-                <div className="min-h-screen p-4 md:p-8 lg:px-12">
-                    <div className="max-w-7xl mx-auto">
-                        <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                            <div>
-                                <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                                    <span className="p-2 bg-indigo-600 rounded-lg text-xl">🎯</span>
-                                    AI 猎人 <span className="text-indigo-400">封焊市场监测</span>
-                                </h1>
-                                <p className="text-slate-500 mt-2 text-sm">自动追踪半导体、MEMS及功率器件封装扩产动向</p>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-[10px] font-mono text-slate-600 bg-slate-900 px-3 py-1 rounded-full border border-slate-800">
-                                    SYNC STATUS: {loading ? 'FETCHING...' : 'LIVE'}
-                                </span>
-                            </div>
-                        </header>
+    function render() {
+      const list = document.getElementById('card-list');
+      const filtered = leadsData.filter(item => {
+        const matchesSearch = item.company.includes(searchQuery) || item.reason.includes(searchQuery);
+        const matchesTab = activeTab === 'all' || item.category === activeTab;
+        return matchesSearch && matchesTab;
+      });
 
-                        <div className="glass-panel rounded-2xl p-4 mb-6 flex flex-col md:flex-row gap-4 items-center">
-                            <div className="flex bg-slate-900 p-1 rounded-xl w-full md:w-auto border border-slate-800">
-                                {["全部", "中国", "国际"].map(r => (
-                                    <button 
-                                        key={r}
-                                        onClick={() => setFilterRegion(r)}
-                                        className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${filterRegion === r ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
-                                    >
-                                        {r}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="relative flex-1 w-full">
-                                <input 
-                                    type="text" 
-                                    placeholder="搜索企业、产线、需求关键词..."
-                                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-all"
-                                    onChange={e => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                        </div>
+      document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
+      
+      list.innerHTML = filtered.map(item => `
+        <div class="card">
+          <div class="card-grid">
+            <div>
+              <span class="tag">${item.tag}</span>
+              <div class="company-name">${item.company}</div>
+              <div style="font-size:12px; color:#94a3b8;">📍 ${item.location}</div>
+            </div>
+            <div class="reason-text">
+              <div style="font-size:11px; font-weight:bold; color:#3b82f6; margin-bottom:4px;">需求情报:</div>
+              ${item.reason}
+            </div>
+            <div style="padding-left:15px; border-left:1px solid #334155;">
+               <div style="font-size:11px; color:#94a3b8;">官方网站:</div>
+               <div class="contact-value">${item.website}</div>
+               <div style="font-size:11px; color:#94a3b8; margin-top:10px;">联系方式:</div>
+               <div class="contact-value" style="color:#10b981;">${item.phone}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
 
-                        <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl border-slate-800">
-                            <table className="w-full text-left">
-                                <thead className="bg-slate-900/80 text-slate-500 text-[11px] uppercase tracking-wider font-bold">
-                                    <tr>
-                                        <th className="px-6 py-4">潜在客户</th>
-                                        <th className="px-6 py-4">核心行业</th>
-                                        <th className="px-6 py-4">扩产/需求情报</th>
-                                        <th className="px-6 py-4 text-right">操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-800">
-                                    {loading ? (
-                                        [...Array(5)].map((_, i) => (
-                                            <tr key={i}><td colSpan="4" className="px-6 py-8 loading-shimmer"></td></tr>
-                                        ))
-                                    ) : filteredData.length > 0 ? filteredData.map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-indigo-900/10 transition-colors group">
-                                            <td className="px-6 py-6">
-                                                <div className="font-bold text-white text-base">{item.name}</div>
-                                                <div className="text-xs text-indigo-400 mt-1 flex items-center gap-1">
-                                                    📍 {typeof item.location === 'object' ? `${item.location.province}·${item.location.city}` : item.location}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-6">
-                                                <span className="bg-slate-800 text-slate-300 text-[10px] px-2 py-1 rounded font-bold border border-slate-700">
-                                                    {item.industry}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-6 max-w-md">
-                                                <p className="text-sm text-slate-400 leading-relaxed">
-                                                    {item.reason || (item.analysis && item.analysis.reason)}
-                                                </p>
-                                                <div className="flex gap-2 mt-2">
-                                                    {(item.tags || (item.analysis && item.analysis.tags) || []).map(tag => (
-                                                        <span key={tag} className="text-[9px] text-indigo-300/70">#{tag}</span>
-                                                    ))}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-6 text-right">
-                                                <a 
-                                                    href={item.url || item.website || (item.contactInfo && item.contactInfo.sourceUrl) || "#"} 
-                                                    target="_blank"
-                                                    className="inline-flex items-center gap-1 text-xs font-bold text-indigo-400 hover:text-white transition-colors bg-indigo-500/10 px-3 py-2 rounded-lg border border-indigo-500/20"
-                                                >
-                                                    查看线索 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path></svg>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    )) : (
-                                        <tr><td colSpan="4" className="py-20 text-center text-slate-600">无匹配线索</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <footer className="mt-8 text-center text-slate-600 text-[10px] tracking-widest uppercase">
-                            © {new Date().getFullYear()} 封焊商机智慧挖掘系统 · DATA REFRESH VIA GITHUB ACTIONS
-                        </footer>
-                    </div>
-                </div>
-            );
-        }
+    // 事件绑定
+    document.getElementById('search-input').oninput = (e) => {
+      searchQuery = e.target.value;
+      render();
+    };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelector('.tab-btn.active').classList.remove('active');
+        btn.classList.add('active');
+        activeTab = btn.dataset.tab;
+        render();
+      };
+    });
+
+    window.onload = render;
+  </script>
 </body>
 </html>
