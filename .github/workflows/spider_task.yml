@@ -5,7 +5,7 @@ on:
   repository_dispatch:
     types: [run-spider]
   
-  # 2. 每天凌晨 2 点自动运行 (18:00 UTC = 02:00 CST)
+  # 2. 每天凌晨 2 点自动运行 (北京时间)
   schedule:
     - cron: '0 18 * * *' 
   
@@ -15,6 +15,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    
+    # 必须显式声明写权限，否则无法推送数据回仓库
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout Code
@@ -28,21 +32,21 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install requests beautifulsoup4
-          # 如果你的 spider.py 以后需要用到这些库，先在这里装好
 
       - name: Run Spider Engine
         run: python spider.py
-        # 这一步会执行爬取、生成 data.json、并上传到你的阿里云 FTP
+        # 此步会生成新的 data.json 并尝试上传 FTP
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name "AI-Hunter-Bot"
           git config --global user.email "bot@insight.ai"
           
-          # 【关键修改】现在只追踪 data.json 的变化
-          # 因为 index.html 已经是动态模板，不再被爬虫修改
+          # 确保只添加数据文件，避免冲突
           git add data.json
           
-          # 提交更改，如果没有变化则直接跳过
+          # 提交更改。如果没有新变化（数据完全一致），则静默退出不报错
           git commit -m "Update Leads Data: $(date)" || exit 0
+          
+          # 推送回 main 分支
           git push
