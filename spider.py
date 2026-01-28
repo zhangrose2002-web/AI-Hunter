@@ -32,9 +32,9 @@ def fetch_industry_leads():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
     }
 
-    # 为了避免被搜索引擎封禁，我们随机抽取 5-8 组关键词进行单次轮询
+    # 为了避免被搜索引擎封禁，我们随机抽取 15组关键词进行单次轮询
     import random
-    selected_kws = random.sample(raw_keywords, min(8, len(raw_keywords)))
+    selected_kws = random.sample(raw_keywords, min(15, len(raw_keywords)))
 
     for kw in selected_kws:
         # 处理组合搜索逻辑：把 "A" + "B" 转换为搜索引擎识别的 A B
@@ -129,6 +129,7 @@ if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
     upload_to_server()
+
 
 
 
