@@ -40,6 +40,9 @@ def fetch_industry_leads():
         # 处理组合搜索逻辑：把 "A" + "B" 转换为搜索引擎识别的 A B
         search_query = kw.replace('"', '').replace('+', ' ')
         encoded_query = urllib.parse.quote(search_query)
+
+        # 在 spider.py 组装数据的地方
+"category": "domestic" if "替代" in kw or "国产" in kw else "intl", # 确保全小写
         
         # 使用 Bing 搜索进行全网探测
         url = f"https://www.bing.com/search?q={encoded_query}"
@@ -70,6 +73,7 @@ def fetch_industry_leads():
             print(f"✅ 关键词 [{kw}] 探测完成")
         except Exception as e:
             print(f"⚠️ 关键词 [{kw}] 抓取异常: {e}")
+
 
     if not real_leads:
         print("⚠️ 本次未探测到实时动态，启用行业常态线索...")
@@ -144,6 +148,7 @@ if __name__ == "__main__":
     leads = fetch_industry_leads()
     save_to_json(leads)
     upload_to_server()
+
 
 
 
