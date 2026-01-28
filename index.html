@@ -69,6 +69,7 @@
     <input type="text" class="search-input" id="search-input" placeholder="输入机构、地区或关键词筛选..." />
 
     <div id="card-list"></div>
+    <div id="loading-state" style="text-align:center; padding:50px; color:#60a5fa;">📡 正在连接线索数据库...</div>
     <div id="empty-state" style="display:none; text-align:center; padding:50px; color:#64748b;">未找到匹配结果</div>
 
     <footer class="footer">
@@ -77,52 +78,17 @@
   </div>
 
   <script>
-    // ==========================================
-    // 数据存储区：Python 爬虫请将新数据写入下方数组中
-    // ==========================================
-    /* DATA_START */
-    const leadsData = [
-      {
-        id: 1,
-        company: "长电科技管理有限公司 (JCET)",
-        location: "江苏·无锡 / 上海",
-        category: "domestic",
-        reason: "近期完成了对晟碟半导体（SanDisk）80%股权的收购。急需针对高性能存储芯片（NAND Flash）的先进封装线测试设备。",
-        website: "www.jcetglobal.com",
-        phone: "0510-86856061",
-        tag: "龙头扩产"
-      },
-      {
-        id: 2,
-        company: "通富微电子股份有限公司",
-        location: "江苏·南通",
-        category: "domestic",
-        reason: "AMD核心封测伙伴。正大规模布局 2.5D/3D Chiplet 先进封装技术，对高性能固晶机有持续采购需求。",
-        website: "www.tfme.com",
-        phone: "0513-85055555",
-        tag: "先进封装"
-      },
-      {
-        id: 4,
-        company: "Amkor Technology (安靠)",
-        location: "上海 / 全球",
-        category: "intl",
-        reason: "全球第二大封测厂。汽车电子封装（SiP）产能扩张，重点关注车规级自动化封测设备。",
-        website: "www.amkor.com",
-        phone: "021-50801388",
-        tag: "外资巨头"
-      }
-    ];
-    /* DATA_END */
-    // ==========================================
-
+    // 1. 初始化空数组，等待外部 JSON 加载
+    let leadsData = [];
     let activeTab = 'all';
     let searchQuery = '';
 
+    // 2. 核心渲染函数
     function render() {
       const list = document.getElementById('card-list');
       const filtered = leadsData.filter(item => {
-        const matchesSearch = item.company.includes(searchQuery) || item.reason.includes(searchQuery);
+        const matchesSearch = item.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                             item.reason.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesTab = activeTab === 'all' || item.category === activeTab;
         return matchesSearch && matchesTab;
       });
@@ -152,7 +118,25 @@
       `).join('');
     }
 
-    // 事件绑定
+    // 3. 异步获取数据逻辑
+    window.onload = async () => {
+      const loadingEl = document.getElementById('loading-state');
+      try {
+        // fetch 时加上时间戳，强制跳过 GitHub Pages 的缓存，确保看到的是最新抓取结果
+        const response = await fetch('data.json?t=' + new Date().getTime()); 
+        if (!response.ok) throw new Error("无法读取 data.json");
+        
+        leadsData = await response.json();
+        loadingEl.style.display = 'none'; // 隐藏加载中
+        render(); // 首次渲染
+      } catch (e) {
+        console.error("加载数据失败:", e);
+        loadingEl.innerHTML = "❌ 数据加载失败，请确认 data.json 是否已生成。";
+        loadingEl.style.color = "#ef4444";
+      }
+    };
+
+    // 4. 事件绑定
     document.getElementById('search-input').oninput = (e) => {
       searchQuery = e.target.value;
       render();
@@ -166,8 +150,6 @@
         render();
       };
     });
-
-    window.onload = render;
   </script>
 </body>
 </html>
