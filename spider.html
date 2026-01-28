@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制台 - AI 猎人 INSIGHT</title>
+    <style>
+        /* 继承首页变量 */
+        :root {
+            --bg: #020617;
+            --text: #f1f5f9;
+            --border: #334155;
+            --blue: #3b82f6;
+            --amber: #f59e0b;
+        }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 2rem; }
+        .config-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .panel { background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        h2 { font-size: 1.2rem; color: var(--blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        /* 关键词标签样式 */
+        .kw-group { margin-bottom: 20px; }
+        .kw-title { font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; }
+        .tags-area { display: flex; flex-wrap: wrap; gap: 8px; }
+        .kw-tag { background: #1e293b; border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .kw-tag.active { border-color: var(--blue); color: var(--blue); background: rgba(59, 130, 246, 0.1); }
+        
+        /* 操作按钮 */
+        .btn-run { width: 100%; padding: 15px; background: var(--blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        .btn-run:hover { background: #2563eb; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        input[type="text"] { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="config-grid">
+        <div class="panel">
+            <h2> 🎯 深度线索探测配置</h2>
+            
+            <div class="kw-group">
+                <div class="kw-title">核心设备相关 (封帽/平行缝焊/激光封焊)</div>
+                <div class="tags-area" id="device-tags">
+                    <span class="kw-tag active">气密性封装设备</span>
+                    <span class="kw-tag active">真空平行缝焊机</span>
+                    <span class="kw-tag active">激光封焊工艺</span>
+                    <span class="kw-tag">金属管壳封装</span>
+                </div>
+            </div>
+
+            <div class="kw-group">
+                <div class="kw-title">热门赛道 (800G/车规级/功率器件)</div>
+                <div class="tags-area" id="sector-tags">
+                    <span class="kw-tag">800G光模块</span>
+                    <span class="kw-tag">IGBT模块</span>
+                    <span class="kw-tag">SiC功率器件</span>
+                    <span class="kw-tag">MEMS传感器</span>
+                    <span class="kw-tag">CPO技术</span>
+                </div>
+            </div>
+
+            <div class="kw-group">
+                <div class="kw-title">扩产信号 (招标/增产/打样)</div>
+                <div class="tags-area" id="signal-tags">
+                    <span class="kw-tag">产线扩能</span>
+                    <span class="kw-tag">新增产线招标</span>
+                    <span class="kw-tag">小批量试产</span>
+                    <span class="kw-tag">产能翻倍</span>
+                    <span class="kw-tag">国产化替代</span>
+                </div>
+            </div>
+
+            <div class="kw-title">自定义组合搜索 (JSON 格式)</div>
+            <input type="text" id="custom-query" placeholder='例如: "产能翻倍" + "TO-CAN封装"'>
+        </div>
+
+        <div class="panel">
+            <h2> 🚀 爬虫引擎参数</h2>
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 12px; color: #94a3b8;">探测深度</label>
+                <select style="width:100%; padding:10px; background:#0f172a; color:white; border:1px solid var(--border);">
+                    <option>全网实时情报 (快速)</option>
+                    <option>深度行业报告 (慢速)</option>
+                    <option>招标/公告定向监控</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 12px; color: #94a3b8;">采集节点</label>
+                <div style="font-size: 12px; margin-top:5px;">
+                    <input type="checkbox" checked> GitHub US-East (国外) <br>
+                    <input type="checkbox" checked> Proxy-Node CN (国内)
+                </div>
+            </div>
+            <button class="btn-run" onclick="triggerSpider()">启动全球线索采集</button>
+            <div id="status-msg" style="margin-top:15px; font-size:12px; color:var(--amber); text-align:center;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 处理标签点击
+        document.querySelectorAll('.kw-tag').forEach(tag => {
+            tag.onclick = () => tag.classList.toggle('active');
+        });
+
+        // 触发 GitHub Actions
+        async function triggerSpider() {
+            const msg = document.getElementById('status-msg');
+            msg.innerText = "正在通过 Webhook 唤醒 GitHub Actions...";
+            
+            // 这里替换为你自己的 GitHub 信息
+            const GITHUB_TOKEN = "你的_GITHUB_TOKEN"; 
+            const REPO_OWNER = "你的用户名";
+            const REPO_NAME = "你的仓库名";
+
+            try {
+                // 模拟发送指令
+                console.log("正在发送关键词至爬虫后端...");
+                setTimeout(() => {
+                    msg.innerHTML = "✅ 指令已送达！<br>正在分配 GitHub Runner 节点...";
+                    // 实际开发时这里使用 fetch 调用 GitHub API
+                }, 1500);
+            } catch (e) {
+                msg.innerText = "发送失败，请检查网络";
+            }
+        }
+    </script>
+</body>
+</html>
